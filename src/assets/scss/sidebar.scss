@@ -1,0 +1,95 @@
+#sidebar {
+  width: 255px;
+  height: 100vh;
+  max-width: 255px;
+  min-width: 200px;
+  background: white;
+  color: #dc3545;
+  -webkit-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  transition: all 0.3s;
+  user-select: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  border-right: 2px solid #dc3545;
+  box-shadow: 5px 0 10px gray;
+  z-index: 10000;
+
+  overflow-y: scroll;
+
+  &.active {
+    margin-left: -300px;
+  }
+  .logo {
+    display: block;
+    width: 120px;
+    height: 120px;
+    margin: 20px auto 10px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .logo span {
+    display: block;
+  }
+  ul.components {
+    padding: 0;
+  }
+  ul li {
+    font-size: 16px;
+  }
+  ul li > ul li {
+    font-size: 14px;
+  }
+  ul li a {
+    padding: 10px 20px;
+    display: block;
+    color: #dc3545;
+    border-bottom: 1px solid #dc3545;
+  }
+  ul li a:hover {
+    background-color: #dc3545;
+    color: white;
+    transition: 0.5s;
+  }
+  ul li.active > a {
+    background-color: #dc3545;
+    color: white;
+    transition: 0.5s;
+  }
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #sidebar {
+    margin-left: -300px;
+    box-shadow: none;
+  }
+  #sidebar.active {
+    margin-left: 0;
+  }
+}
+
+a[data-toggle='collapse'] {
+  position: relative;
+}
+
+.dropdown-toggle::after {
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+@media (max-width: 991.98px) {
+  #sidebarCollapse span {
+    display: none;
+  }
+}

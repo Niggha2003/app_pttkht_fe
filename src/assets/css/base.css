@@ -1,0 +1,30 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  overflow-x: hidden; /* Ẩn thanh trượt ngang */
+}
+
+/* custom scrollbar */
+/* CSS */
+::-webkit-scrollbar {
+  width: 0; /* chiều rộng của thanh cuộn */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* màu nền của thanh cuộn */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* màu nền của phần cuộn */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* màu nền của phần cuộn khi di chuột qua */
+}
