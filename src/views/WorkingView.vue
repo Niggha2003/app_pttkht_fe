@@ -9,6 +9,8 @@ const componentRender = shallowRef(props.innerComponent)
 
 <template>
   <InterfaceComponent>
-    <component :is="componentRender"></component>
+    <keep-alive>
+      <component :is="componentRender"></component>
+    </keep-alive>
   </InterfaceComponent>
 </template>

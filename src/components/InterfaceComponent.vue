@@ -9,9 +9,9 @@ import HeaderComponent from '@/components/HeaderComponent.vue'
     <div class="sidebarContainer">
       <sidebar-component></sidebar-component>
     </div>
-    <div class="flex-grow-1 mt-5 ps-2" style="max-width: 1257px">
+    <div class="flex-grow-1 ps-2" style="max-width: 1270px; margin-top: 10vh">
       <header-component></header-component>
-      <div class="me-1">
+      <div class="me-1 ms-2">
         <slot></slot>
       </div>
       <footer-component></footer-component>

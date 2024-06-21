@@ -1,13 +1,10 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
+html {
+  font-size: 14px !important;
 }
 
 body {
   overflow-x: hidden; /* Ẩn thanh trượt ngang */
+  background-color: rgb(230, 234, 243) !important;
 }
 
 /* custom scrollbar */

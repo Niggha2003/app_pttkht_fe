@@ -3,11 +3,14 @@ import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { RouterLink } from 'vue-router'
 import importImage from '@/helpers/importImage'
+import { faCircle } from '@fortawesome/free-solid-svg-icons'
+import { MenuItemChange, MenuItemChildChange } from './menuList'
 
 const store = useStore()
 const user = store.state.user
 
 const accountImg = importImage('user', user.photo)
+const menu = ref(store.state.menu)
 
 const handleOpenNavChild = (e) => {
   const childNav = e.target.nextElementSibling
@@ -15,38 +18,14 @@ const handleOpenNavChild = (e) => {
 }
 
 const handleMenuItemClick = (i) => {
-  menu.value.forEach((menuItem) => {
-    menuItem.active = false
-    if (menuItem != menu.value[i]) {
-      menuItem.listChild.forEach((child) => {
-        child.active = false
-      })
-    }
-  })
-  menu.value[i].active = true
-  menu.value[i].opened = !menu.value[i].opened
-  store.commit('changeMenu', menu)
+  menu.value = MenuItemChange(menu.value, i)
+  store.commit('changeMenu', menu.value)
 }
 
 const handleMenuItemChildClick = (index, childIndex) => {
-  menu.value.forEach((menuItem) => {
-    menuItem.active = false
-    if (menuItem != menu.value[index]) {
-      menuItem.listChild.forEach((child) => {
-        child.active = false
-      })
-    }
-  })
-  menu.value[index].active = true
-  menu.value[index].listChild.forEach((child) => {
-    child.active = false
-  })
-
-  menu.value[index].listChild[childIndex].active = true
-  store.commit('changeMenu', menu)
+  menu.value = MenuItemChildChange(menu.value, index, childIndex)
+  store.commit('changeMenu', menu.value)
 }
-
-const menu = ref(store.state.menu)
 
 // const handleResizeMousedown = (e) => {
 //   if (e.clientX < 3 + e.target.clientWidth && e.clientX > +e.target.clientWidth - 3) {
@@ -89,13 +68,17 @@ const menu = ref(store.state.menu)
   <nav id="sidebar">
     <div class="">
       <a class="img logo rounded-circle mb-2" :style="`background-image: url(${accountImg})`"></a>
-      <div class="text-center mb-3 fs-5 fw-bolder text-dark">{{ user.name }}</div>
+      <div class="text-center mb-6 fs-5 fw-bolder" style="color: #c0c6ca">{{ user.name }}</div>
       <ul class="list-unstyled components mb-5">
         <template v-for="(menuItem, index) in menu" :key="index">
           <li
             :class="menuItem.active === true ? 'active' : ''"
             v-if="menuItem.show === true"
-            @click="() => handleMenuItemClick(index)"
+            @click="
+              () => {
+                handleMenuItemClick(index)
+              }
+            "
           >
             <a
               v-if="menuItem.listChild.length > 0"
@@ -103,9 +86,12 @@ const menu = ref(store.state.menu)
               aria-expanded="false"
               class="dropdown-toggle"
               @click.prevent="handleOpenNavChild"
-              >{{ menuItem.name }}
+            >
+              <font-awesome-icon class="me-1" :icon="menuItem.icon" /> {{ menuItem.name }}
             </a>
-            <a @click.prevent v-else>{{ menuItem.name }}</a>
+            <a @click.prevent v-else
+              ><font-awesome-icon class="me-1" :icon="menuItem.icon" /> {{ menuItem.name }}</a
+            >
             <ul
               v-if="menuItem.listChild.length > 0"
               :class="`collapse list-unstyled ${menuItem.opened ? 'show' : ''}`"
@@ -114,9 +100,27 @@ const menu = ref(store.state.menu)
                 v-for="(menuItemChild, childIndex) in menuItem.listChild"
                 :key="childIndex"
                 :class="menuItemChild.active === true ? 'active' : ''"
-                @click.stop.prevent="() => handleMenuItemChildClick(index, childIndex)"
+                @click.stop.prevent="
+                  () => {
+                    handleMenuItemChildClick(index, childIndex)
+                  }
+                "
               >
-                <router-link :to="menuItemChild.to">{{ menuItemChild.name }}</router-link>
+                <router-link
+                  :to="menuItemChild.to"
+                  style="display: flex; align-items: center; justify-content: space-between"
+                >
+                  <div>
+                    <font-awesome-icon :icon="menuItemChild.icon" class="me-1" />
+                    {{ menuItemChild.name }}
+                  </div>
+
+                  <font-awesome-icon
+                    :class="menuItemChild.active === true ? '' : 'd-none'"
+                    :icon="faCircle"
+                    style="width: 8px; height: 8px"
+                  />
+                </router-link>
               </li>
             </ul>
           </li>

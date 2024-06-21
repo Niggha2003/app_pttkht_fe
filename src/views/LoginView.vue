@@ -4,7 +4,6 @@ import { get, post } from '@/utils/httpRequest'
 import Cookies from 'js-cookie'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 // Trong một hàm action của Vuex
 const store = useStore()
@@ -47,14 +46,14 @@ async function handleLogin() {
     setTimeout(async () => {
       const resultLogin = await login()
 
-      loading.value = false
       if (resultLogin) {
-        Cookies.set('jwt-token', resultLogin, { expires: new Date(Date.now() + 3600 * 1000) })
+        Cookies.set('jwt-token', resultLogin, { expires: new Date(Date.now() + 7200 * 1000) })
         router.push('/')
         await setUser()
       } else {
         wrongAccess.value = true
       }
+      loading.value = false
     }, 700)
   } catch (error) {
     // Xử lý lỗi khi đăng nhập không thành công
@@ -73,7 +72,7 @@ async function handleLogin() {
           </div>
           <div class="card-body">
             <form role="form" @submit.prevent="handleLogin">
-              <div class="mb-3">
+              <div class="mb-4 mt-3">
                 <div class="form-group">
                   <div class="">
                     <!----><input
@@ -88,7 +87,7 @@ async function handleLogin() {
                   </div>
                 </div>
               </div>
-              <div class="mb-3">
+              <div class="mb-4">
                 <div class="form-group">
                   <div class="">
                     <!----><input
@@ -126,7 +125,7 @@ async function handleLogin() {
                   fdprocessedid="ycmkz9"
                   v-if="loading"
                 >
-                  <font-awesome-icon class="spinner-border-sm spinner-border" :icon="faSpinner" />
+                  <div class="spinner-border" style="width: 20px; height: 20px" role="status"></div>
                 </button>
               </div>
             </form>

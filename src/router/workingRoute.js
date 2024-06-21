@@ -1,16 +1,11 @@
 import WorkingHome from '@/components/working/WorkingHome.vue'
 import WorkingBlacklist from '@/components/working/WorkingBlacklist.vue'
-import WorkingEfficiency from '@/components/working/WorkingEfficiency.vue'
 import WorkingStatistic from '@/components/working/WorkingStatistic.vue'
 
 const workingComponent = [
   {
     name: 'list',
     com: WorkingHome
-  },
-  {
-    name: 'ef',
-    com: WorkingEfficiency
   },
   {
     name: 'stc',
@@ -27,6 +22,7 @@ export default {
   name: 'working',
   component: () => import('@/views/WorkingView.vue'),
   props: (route) => {
+    // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent
     const workingPlace = workingComponent.find(
       (element) => element.name && element.name == route.params.place
