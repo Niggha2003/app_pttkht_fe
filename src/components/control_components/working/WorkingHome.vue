@@ -191,7 +191,7 @@ const handleChangeModifyMode = (state) => {
           </IconField>
         </div>
       </template>
-      <template #empty> Không tìm thấy lao động nào có thông tin như vậy. </template>
+      <template #empty> Không tìm thấy lao động. </template>
       <Column
         field="image"
         header="Ảnh"

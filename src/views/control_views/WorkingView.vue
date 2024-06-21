@@ -1,5 +1,5 @@
 <script setup>
-import InterfaceComponent from '@/components/InterfaceComponent.vue'
+import InterfaceComponent from '@/components/control_components/InterfaceComponent.vue'
 import { shallowRef } from 'vue'
 
 const props = defineProps(['innerComponent'])

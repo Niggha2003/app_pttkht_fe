@@ -1,6 +1,6 @@
-import WorkingHome from '@/components/working/WorkingHome.vue'
-import WorkingBlacklist from '@/components/working/WorkingBlacklist.vue'
-import WorkingStatistic from '@/components/working/WorkingStatistic.vue'
+import WorkingHome from '@/components/control_components/working/WorkingHome.vue'
+import WorkingBlacklist from '@/components/control_components/working/WorkingBlacklist.vue'
+import WorkingStatistic from '@/components/control_components/working/WorkingStatistic.vue'
 
 const workingComponent = [
   {
@@ -20,7 +20,7 @@ const workingComponent = [
 export default {
   path: '/working/:place?',
   name: 'working',
-  component: () => import('@/views/WorkingView.vue'),
+  component: () => import('@/views/control_views/WorkingView.vue'),
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent

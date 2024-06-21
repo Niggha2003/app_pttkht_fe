@@ -1,11 +1,15 @@
 <!-- eslint-disable no-unused-vars -->
 <script setup>
-import { faBell } from '@fortawesome/free-regular-svg-icons'
 import { ref } from 'vue'
 import Cookies from 'js-cookie'
 import { useStore } from 'vuex'
+
 import { useRouter } from 'vue-router'
+
+import { faBell } from '@fortawesome/free-regular-svg-icons'
+
 import importImage from '@/helpers/importImage'
+
 import OverlayPanel from 'primevue/overlaypanel'
 
 const store = useStore()

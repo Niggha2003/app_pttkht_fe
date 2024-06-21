@@ -1,5 +1,5 @@
 import { createStore } from 'vuex'
-import menuList from '@/components/menuList'
+import menuList from '@/components/control_components/menuList'
 
 export default createStore({
   state: {

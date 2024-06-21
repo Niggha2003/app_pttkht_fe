@@ -1,13 +1,16 @@
 <script setup>
 // import { get } from '@/utils/httpRequest'
 import { onMounted, ref } from 'vue'
-import WorkerInfoComponent from './WorkerInfoComponent.vue'
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
-import importImage from '@/helpers/importImage'
-import modifyDate from '@/helpers/modifyDate'
 import { post } from '@/utils/httpRequest'
 import { useStore } from 'vuex'
+
+import { FilterMatchMode, FilterOperator } from 'primevue/api'
+
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+
+import WorkerInfoComponent from './WorkerInfoComponent.vue'
+import importImage from '@/helpers/importImage'
+import modifyDate from '@/helpers/modifyDate'
 
 const store = useStore()
 const workerList = ref(null)
@@ -150,7 +153,7 @@ const handleRemoveWorkerToBlackList = async (workerId) => {
           </IconField>
         </div>
       </template>
-      <template #empty> Không tìm thấy lao động nào có thông tin như vậy. </template>
+      <template #empty> Không tìm thấy lao động. </template>
       <Column
         field="image"
         header="Ảnh"

@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import { get } from '@/utils/httpRequest'
-import workingRoute from './workingRoute'
-import menuList from '@/components/menuList'
 
+import { get } from '@/utils/httpRequest'
+
+import HomeView from '@/views/control_views/HomeView.vue'
+import workingRoute from './workingRoute'
 import store from '@/store'
-import { MenuItemChildChange } from '@/components/menuList'
+
+import menuList from '@/components/control_components/menuList'
+import { MenuItemChildChange } from '@/components/control_components/menuList'
 
 const routes = [
   {
@@ -16,7 +18,7 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/LoginView.vue')
+    component: () => import('@/views/control_views/LoginView.vue')
   },
   workingRoute
 ]

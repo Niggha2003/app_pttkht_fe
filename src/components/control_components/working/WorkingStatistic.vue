@@ -255,7 +255,7 @@ const getWorkerEfficiencyLine = async () => {
     const goAbroadDate = new Date(w.timeGoAbroad)
     w.efficiency.forEach((ef) => {
       // thời gian sau khi xuất cảnh được ef.tháng
-      const currentDate = goAbroadDate
+      const currentDate = new Date(w.timeGoAbroad)
       currentDate.setMonth(goAbroadDate.getMonth() + ef.month)
       const yearIndex = efficiencies.value.findIndex((c) => c.year == currentDate.getFullYear())
       if (yearIndex != -1) {
