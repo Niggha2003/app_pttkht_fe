@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ProductService } from '@/services/ProductService'
 import { get } from '@/utils/httpRequest'
 
 import { RouterLink } from 'vue-router'

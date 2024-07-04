@@ -52,3 +52,9 @@ a {
 .ql-snow .ql-picker.ql-font .ql-picker-item::before {
   content: attr(data-value) !important;
 }
+
+.ql-editor img {
+  border-radius: 10px;
+  box-shadow: 0 0 5px #ccc;
+  padding: 10px;
+}

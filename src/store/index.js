@@ -6,7 +6,8 @@ export default createStore({
     user: JSON.parse(sessionStorage.getItem('user')),
     isLoggedIn: sessionStorage.getItem('isLoggedIn'),
     menu: menuList,
-    dataNeeded: JSON.parse(sessionStorage.getItem('dataNeeded'))
+    dataNeeded: JSON.parse(sessionStorage.getItem('dataNeeded')),
+    isHomePageModify: false
   },
   mutations: {
     changeMenu(state, menu) {
@@ -19,6 +20,9 @@ export default createStore({
     changeDataNeeded(state, data) {
       sessionStorage.setItem('dataNeeded', JSON.stringify(data))
       state.dataNeeded = JSON.parse(sessionStorage.getItem('dataNeeded'))
+    },
+    setHomePageModify(state, modifyState) {
+      state.isHomePageModify = modifyState
     },
     login(state, isLoggedIn) {
       sessionStorage.setItem('isLoggedIn', isLoggedIn)

@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 import HP_HeaderComponent from '@/components/home_page_components/HP_HeaderComponent.vue'
 import HP_FooterComponent from '@/components/home_page_components/HP_FooterComponent.vue'
 import HP_HomeViewSliderComponent from '@/components/home_page_components/home_view/HP_HomeViewSliderComponent.vue'
@@ -7,6 +8,13 @@ import HP_HomeViewOrderComponent from '@/components/home_page_components/home_vi
 import HP_HomeViewPartnerOrganizationComponent from '@/components/home_page_components/home_view/HP_HomeViewPartnerOrganizationComponent.vue'
 
 import ScrollTop from 'primevue/scrolltop'
+import { provide } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const isHomePageModify = ref(store.state.isHomePageModify)
+provide('homePageModify', isHomePageModify)
 </script>
 
 <template>
