@@ -10,7 +10,7 @@ body {
 /* custom scrollbar */
 /* CSS */
 ::-webkit-scrollbar {
-  width: 0; /* chiều rộng của thanh cuộn */
+  width: 5px; /* chiều rộng của thanh cuộn */
 }
 
 ::-webkit-scrollbar-track {
@@ -18,10 +18,37 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888; /* màu nền của phần cuộn */
+  background: #b5b5b5; /* màu nền của phần cuộn */
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555; /* màu nền của phần cuộn khi di chuột qua */
+}
+
+a {
+  text-decoration: none !important;
+}
+
+.ql-font-Arial {
+  font-family: Arial, sans-serif;
+}
+.ql-font-Verdana {
+  font-family: Verdana, sans-serif;
+}
+.ql-font-Times {
+  font-family: 'Times New Roman', serif;
+}
+.ql-font-Courier {
+  font-family: 'Courier New', monospace;
+}
+
+/* Sửa đổi nội dung trước các mục lựa chọn font chữ */
+.ql-snow .ql-picker.ql-font .ql-picker-label::before {
+  content: attr(data-value) !important;
+}
+
+/* Sửa đổi nội dung trước các mục lựa chọn font chữ */
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+  content: attr(data-value) !important;
 }

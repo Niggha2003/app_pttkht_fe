@@ -1,6 +1,6 @@
 import WorkingHome from '@/components/control_components/working/WorkingHome.vue'
-import WorkingBlacklist from '@/components/control_components/working/WorkingBlacklist.vue'
 import WorkingStatistic from '@/components/control_components/working/WorkingStatistic.vue'
+import WorkingBlacklist from '@/components/control_components/working/WorkingBlacklist.vue'
 
 const workingComponent = [
   {
@@ -18,7 +18,7 @@ const workingComponent = [
 ]
 
 export default {
-  path: '/working/:place?',
+  path: '/control/working/:place?',
   name: 'working',
   component: () => import('@/views/control_views/WorkingView.vue'),
   props: (route) => {

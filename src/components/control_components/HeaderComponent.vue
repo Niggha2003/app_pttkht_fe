@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { useStore } from 'vuex'
 
 import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 import { faBell } from '@fortawesome/free-regular-svg-icons'
 
@@ -73,7 +74,7 @@ const handleSignOut = () => {
   sessionStorage.removeItem('user')
   sessionStorage.removeItem('dataNeeded')
   Cookies.set('jwt-token', '', { expires: 0 })
-  router.push('/login')
+  router.push('/control/login')
 }
 </script>
 
@@ -93,7 +94,16 @@ const handleSignOut = () => {
       @click="toggleAvatar"
     ></div>
     <OverlayPanel ref="avatar">
-      <div style="width: 100%" class="btn btn-outline-info border-0" @click.stop>Trang cá nhân</div>
+      <div style="width: 100%" @click.stop>
+        <router-link
+          :to="{
+            name: 'home'
+          }"
+          class="btn btn-outline-info border-0"
+          style="text-decoration: none"
+          >Trang cá nhân</router-link
+        >
+      </div>
       <div
         class="my-2"
         style="width: 100%; height: 1px; background-color: rgb(230, 234, 243)"

@@ -2,7 +2,8 @@ import {
   faPeopleGroup,
   faFolder,
   faFileContract,
-  faAddressBook
+  faAddressBook,
+  faPager
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faList, faChartSimple, faBan } from '@fortawesome/free-solid-svg-icons'
@@ -58,6 +59,7 @@ const menu = [
     opened: false,
     type: 'ordering',
     icon: faFolder,
+    to: { name: 'home_page' },
     listChild: []
   },
   {
@@ -67,6 +69,7 @@ const menu = [
     opened: false,
     type: 'signing',
     icon: faFileContract,
+    to: { name: 'home_page' },
     listChild: []
   },
   {
@@ -76,6 +79,17 @@ const menu = [
     opened: false,
     type: 'employee',
     icon: faAddressBook,
+    to: { name: 'home_page' },
+    listChild: []
+  },
+  {
+    name: 'Xem trang web',
+    active: false,
+    show: true,
+    opened: false,
+    type: 'web',
+    icon: faPager,
+    to: { name: 'home_page' },
     listChild: []
   }
 ]
@@ -110,6 +124,17 @@ export const MenuItemChildChange = (menu, index, childIndex) => {
   })
 
   menu[index].listChild[childIndex].active = true
+  return menu
+}
+
+export const MenuItemReset = (menu) => {
+  menu.forEach((menuItem) => {
+    menuItem.active = false
+    menuItem.opened = false
+    menuItem.listChild.forEach((child) => {
+      child.active = false
+    })
+  })
   return menu
 }
 

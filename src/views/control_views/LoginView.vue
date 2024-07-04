@@ -4,7 +4,9 @@ import { get, post } from '@/utils/httpRequest'
 import { ref } from 'vue'
 import Cookies from 'js-cookie'
 import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+
+import Button from 'primevue/button'
 
 // Trong một hàm action của Vuex
 const store = useStore()
@@ -49,7 +51,7 @@ async function handleLogin() {
 
       if (resultLogin) {
         Cookies.set('jwt-token', resultLogin, { expires: new Date(Date.now() + 7200 * 1000) })
-        router.push('/')
+        router.push('/control')
         await setUser()
       } else {
         wrongAccess.value = true
@@ -65,6 +67,13 @@ async function handleLogin() {
 
 <template>
   <div class="container vh-100 d-flex align-items-center">
+    <RouterLink
+      style="position: fixed; top: 10vh; left: 10vw"
+      class="fs-5"
+      :to="{ name: 'home_page' }"
+    >
+      <Button severity="danger" label="Xem trang web" icon="pi pi-home"></Button>
+    </RouterLink>
     <div class="row w-100">
       <div class="mx-auto col-lg-5">
         <div class="card card-plain box-shadow-custom">
