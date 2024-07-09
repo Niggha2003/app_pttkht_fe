@@ -1,12 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { get } from '@/utils/httpRequest'
+import { get, post } from '@/utils/httpRequest'
 
 import { RouterLink } from 'vue-router'
 import DataTable from 'primevue/datatable'
 import Button from 'primevue/button'
+import HP_NewsMultiSelectComponent from '@/components/home_page_components/news/HP_NewsMultiSelectComponent.vue'
 
 const orders = ref()
+const ordersHot = ref()
+
+const isHomePageModify = defineModel('isHomePageModify')
+
+// giá trị function được truyền ra ngoài cho component home có thể thực thi
+let updateFunction = defineModel('updateFunction')
 
 onMounted(async () => {
   await getOrders()
@@ -16,7 +23,8 @@ onMounted(async () => {
 const getOrders = async () => {
   try {
     orders.value = await get('order/order/', {})
-    orders.value = orders.value.filter((order) => order.isHot).reverse()
+    orders.value = orders.value.reverse()
+    ordersHot.value = orders.value.filter((order) => order.isHot)
   } catch (e) {
     console.log(e)
   }
@@ -26,20 +34,44 @@ const formatCurrency = (value) => {
   value = value * 1000
   return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
 }
+
+// thay đổi updateFunction để truyền ra ngoài cho component home thực thi mỗi khi chọn update
+updateFunction.value = async () => {
+  let result
+  for (const order of orders.value) {
+    if (order.isHot) {
+      result = await post(`/order/order/${order._id}/update`, { order: { ...order, isHot: false } })
+    }
+  }
+  for (const order of ordersHot.value) {
+    result = await post(`/order/order/${order._id}/update`, { order: { ...order, isHot: true } })
+  }
+  return result
+}
 </script>
 
 <template>
   <div>
     <div
-      class="d-flex flex-column justify-content-center align-items-center"
+      class="d-flex flex-column justify-content-center align-items-center position-relative"
       style="width: 500px; margin: auto auto 80px; color: #8b8a8a"
     >
       <span class="pi pi-search mb-4 fs-1 fw-bolder"></span>
       <span class="fs-2 fw-bolder">Tuyển dụng đơn hàng</span>
+      <div v-if="isHomePageModify" style="position: absolute; top: 60px; right: -410px">
+        <HP_NewsMultiSelectComponent
+          style="width: 200px !important"
+          v-model:choices="ordersHot"
+          v-model:options="orders"
+          :optionsLabel="'orderName'"
+          :placeholder="'Đơn hàng lao động'"
+          :selectionLimit="6"
+        ></HP_NewsMultiSelectComponent>
+      </div>
     </div>
     <div class="card container">
       <DataTable
-        :value="orders"
+        :value="ordersHot"
         tableStyle="min-width: 50rem"
         :pt="{
           column: {
@@ -112,7 +144,13 @@ const formatCurrency = (value) => {
           }"
         ></Column>
         <template #footer>
-          <div class="text-info">Xem thêm đơn hàng lao động.</div>
+          <RouterLink
+            class="text-info hoverRed"
+            :to="{
+              name: 'hp_order_view'
+            }"
+            >Xem thêm đơn hàng lao động.
+          </RouterLink>
           <RouterLink
             :to="{
               name: 'hp_form_view'
@@ -131,3 +169,9 @@ const formatCurrency = (value) => {
     </div>
   </div>
 </template>
+
+<style>
+.hoverRed:hover {
+  color: rgb(251, 40, 40) !important;
+}
+</style>

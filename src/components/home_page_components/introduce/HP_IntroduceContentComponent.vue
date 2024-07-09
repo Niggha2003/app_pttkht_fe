@@ -18,7 +18,7 @@ const Font = Quill.import('formats/font')
 Font.whitelist = fonts
 Quill.register(Font, true)
 
-// dùng cái này để khi upload ảnh chuyển ảnh về dạng url
+// dùng cái này để khi upload ảnh chuyển src của ảnh về dạng url
 Quill.register('modules/imageUploader', ImageUploader)
 
 const modules = {

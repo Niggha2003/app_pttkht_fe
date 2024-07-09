@@ -2,11 +2,19 @@
 import { ref, onMounted } from 'vue'
 
 import HP_ContentCoverComponent from '@/components/home_page_components/content/HP_ContentCoverComponent.vue'
+import HP_NewsMultiSelectComponent from '../news/HP_NewsMultiSelectComponent.vue'
 
 import Carousel from 'primevue/carousel'
-import { get } from '@/utils/httpRequest'
+
+import { get, post } from '@/utils/httpRequest'
 
 const focalNews = ref()
+const focalNewsShow = ref()
+
+const isHomePageModify = defineModel('isHomePageModify')
+
+// giá trị function được truyền ra ngoài cho component home có thể thực thi
+let updateFunction = defineModel('updateFunction')
 
 onMounted(async () => {
   await getNews()
@@ -14,7 +22,8 @@ onMounted(async () => {
 
 const getNews = async () => {
   focalNews.value = await get('/news')
-  focalNews.value = focalNews.value.filter((news) => news.type == 'focal')
+  focalNews.value = focalNews.value.filter((news) => news.type == 'focal').reverse()
+  focalNewsShow.value = focalNews.value.filter((news) => news.showOnHome == 0)
 }
 
 const responsiveOptions = ref([
@@ -39,6 +48,21 @@ const responsiveOptions = ref([
     numScroll: 1
   }
 ])
+
+// thay đổi updateFunction để truyền ra ngoài cho component home thực thi mỗi khi chọn update
+updateFunction.value = async () => {
+  let result
+  for (const news of focalNews.value) {
+    if (news.showOnHome != null) {
+      news.showOnHome = 4
+      result = await post(`/news/${news._id}/update`, { news: news })
+    }
+  }
+  for (const news of focalNewsShow.value) {
+    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 0 } })
+  }
+  return result
+}
 </script>
 
 <template>
@@ -49,8 +73,18 @@ const responsiveOptions = ref([
       class="card d-flex align-items-center container border-0"
       style="margin: auto"
     >
+      <div v-if="isHomePageModify" style="position: absolute; top: 5px; right: 10px">
+        <HP_NewsMultiSelectComponent
+          style="width: 200px !important"
+          v-model:choices="focalNewsShow"
+          v-model:options="focalNews"
+          :optionsLabel="'title'"
+          :placeholder="'Tiêu điểm'"
+          :selectionLimit="6"
+        ></HP_NewsMultiSelectComponent>
+      </div>
       <Carousel
-        :value="focalNews"
+        :value="focalNewsShow"
         :numVisible="1"
         :numScroll="1"
         :responsiveOptions="responsiveOptions"

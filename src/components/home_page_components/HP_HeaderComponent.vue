@@ -1,44 +1,53 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import importImage from '@/helpers/importImage'
 
 import HP_HeaderNavbarComponent from './header/HP_HeaderNavbarComponent.vue'
+import { get } from '@/utils/httpRequest'
 
 const props = defineProps(['activeIndex'])
 
 const activeIndex = props.activeIndex
 const banner = importImage('banner', 'banner.jpg')
 const logo = importImage('banner', 'logo.png')
+const header_infos = ref()
 
-const header_infos = [
-  {
-    text: 'Hotline: 0976760298',
-    type: 'span',
-    icon: 'pi pi-phone'
-  },
-  {
-    text: 'Gmail: nguyennghia241003@gmail.com',
-    type: 'span',
-    icon: 'pi pi-envelope'
-  },
-  {
-    text: 'Liên hệ',
-    type: 'link',
-    icon: 'pi pi-address-book',
-    to: {
-      name: 'hp_form_view'
+onMounted(async () => {
+  await getInfo()
+})
+
+const getInfo = async () => {
+  const infoCompany = await get('/info')
+  header_infos.value = [
+    {
+      text: `Hotline: ${infoCompany.phoneNumber}`,
+      type: 'span',
+      icon: 'pi pi-phone'
+    },
+    {
+      text: `Gmail: ${infoCompany.email}`,
+      type: 'span',
+      icon: 'pi pi-envelope'
+    },
+    {
+      text: 'Liên hệ',
+      type: 'link',
+      icon: 'pi pi-address-book',
+      to: {
+        name: 'hp_form_view'
+      }
+    },
+    {
+      text: 'Bạn là nhân viên?',
+      type: 'link',
+      icon: 'pi pi-users',
+      to: {
+        name: 'home'
+      }
     }
-  },
-  {
-    text: 'Bạn là nhân viên?',
-    type: 'link',
-    icon: 'pi pi-users',
-    to: {
-      name: 'home'
-    }
-  }
-]
+  ]
+}
 
 const navbar_items = ref([
   {
@@ -77,7 +86,11 @@ navbar_items.value[activeIndex].active = true
 <template>
   <div class="Header">
     <div class="Header__info__cover container-fluid">
-      <div class="Header__info container d-flex justify-content-end" style="font-size: 11px">
+      <div
+        v-if="header_infos"
+        class="Header__info container d-flex justify-content-end"
+        style="font-size: 11px"
+      >
         <template v-for="header_info in header_infos" :key="header_info">
           <span
             v-if="header_info.type == 'span'"

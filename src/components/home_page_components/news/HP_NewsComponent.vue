@@ -5,6 +5,7 @@ import modifyDate from '@/helpers/modifyDate'
 const props = defineProps(['props'])
 const attrs = props.props
 
+// kiểm tra loại hình trình bày nếu 1 là dạng cột, 2 là kiểu có ảnh nhưng hàng ngang, 0 là kiểu hàng ngang và không có ảnh
 const checkDisplay = (type, hasImg) => {
   if (type == 'col') {
     return 1

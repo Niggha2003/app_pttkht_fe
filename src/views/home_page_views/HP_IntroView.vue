@@ -12,7 +12,6 @@ import HP_IntroduceContentComponent from '@/components/home_page_components/intr
 
 const store = useStore()
 const introduce = ref(null)
-const result = ref(null)
 const newses = ref(null)
 const isHomePageModify = ref(store.state.isHomePageModify)
 
@@ -27,11 +26,10 @@ const getIntroduce = async () => {
 
 const setIntroduce = async () => {
   introduce.value.time = new Date()
-  result.value = await post('/introduce', { introduce: introduce.value })
-  setTimeout(() => {
-    result.value = null
-  }, 3000)
+  let result
+  result = await post('/introduce', { introduce: introduce.value })
   await getIntroduce()
+  return result
 }
 
 const getNews = async () => {
@@ -43,8 +41,7 @@ const getNews = async () => {
 <template>
   <HP_ModifyComponent
     v-model:state="isHomePageModify"
-    v-model:result="result"
-    @save-function="setIntroduce"
+    :saveFunction="setIntroduce"
   ></HP_ModifyComponent>
   <HP_HeaderComponent :activeIndex="1"></HP_HeaderComponent>
   <HP_IntroduceContentComponent

@@ -11,6 +11,10 @@ import store from './store'
 import viLocale from '@/locales/viLocale'
 /* import prime vue lib */
 import PrimeVue from 'primevue/config'
+
+// toast for prime vue
+import ToastService from 'primevue/toastservice'
+
 //css for prime vue
 import 'primevue/resources/themes/aura-light-green/theme.css'
 import 'primevue/resources/primevue.min.css' /* Deprecated */
@@ -24,6 +28,7 @@ const app = createApp(App)
 app.use(store)
 app.use(router)
 app.use(PrimeVue, { ripple: true, locale: viLocale })
+app.use(ToastService)
 app.component('font-awesome-icon', FontAwesomeIcon)
 
 app.mount('#app')
