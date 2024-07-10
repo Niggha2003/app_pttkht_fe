@@ -4,15 +4,22 @@ import ImageUploader from 'quill-image-uploader'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import modifyDate from '@/helpers/modifyDate'
-
+import { ref } from 'vue'
 import Editor from 'primevue/editor'
 
-const newses = defineModel('newses')
-const orders = defineModel('orders')
 const isHomePageModify = defineModel('isHomePageModify')
 const content = defineModel('content')
-const props = defineProps(['time'])
+const props = defineProps(['time', 'orders', 'newses'])
 const time = props.time
+const newses = ref(props.newses)
+const orders = ref(props.orders)
+
+if (newses.value) {
+  newses.value = newses.value.splice(0, 6)
+}
+if (orders.value) {
+  orders.value = orders.value.splice(0, 6)
+}
 
 // Custom fonts cho quill
 const fonts = ['Arial', 'Verdana', 'Times', 'Courier']
@@ -119,7 +126,15 @@ const modules = {
           </div>
           <ul>
             <li class="fs-6 fw-bolder text-contrast m-3" v-for="news in newses" :key="news">
-              {{ news.title }}
+              <RouterLink
+                class="hoverRed"
+                :to="{
+                  name: 'hp_news_view',
+                  params: { isForeign: !!news.isForeignNews, newsId: news._id }
+                }"
+              >
+                {{ news.title }}
+              </RouterLink>
             </li>
           </ul>
         </div>
@@ -140,8 +155,17 @@ const modules = {
             <span style="margin-top: -3px">Đơn hàng lựa chọn</span>
           </div>
           <ul>
-            <li class="fs-6 fw-bolder text-contrast m-3" v-for="order in orders" :key="order">
-              {{ order.orderName }}
+            <li
+              class="fs-6 fw-bolder hoverRed text-contrast m-3"
+              v-for="order in orders"
+              :key="order"
+            >
+              <RouterLink
+                class="hoverRed"
+                :to="{ name: 'hp_order_view', params: { orderId: order._id } }"
+              >
+                {{ order.orderName }}
+              </RouterLink>
             </li>
           </ul>
         </div>
@@ -150,4 +174,8 @@ const modules = {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.hoverRed:hover {
+  color: rgb(253, 66, 66) !important;
+}
+</style>

@@ -154,116 +154,61 @@ onUpdated(() => {
           class="col-sm-12 col-lg-8 p-0 row justify-content-between position-relative"
         >
           <div v-if="company_news0[0]" class="col-5 p-0">
-            <RouterLink
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news0[0].isForeignNews,
-                  newsId: company_news0[0]._id
-                }
+            <HP_NewsComponent
+              :props="{
+                type: 'col',
+                hasImg: true,
+                news: company_news0[0]
               }"
-            >
-              <HP_NewsComponent
-                :props="{
-                  type: 'col',
-                  hasImg: true,
-                  news: company_news0[0]
-                }"
-              ></HP_NewsComponent>
-            </RouterLink>
+            ></HP_NewsComponent>
           </div>
           <div class="col-6 p-0">
             <!-- tin có ảnh -->
-            <RouterLink
+
+            <HP_NewsComponent
               v-if="company_news1[1]"
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news1[0].isForeignNews,
-                  newsId: company_news1[0]._id
-                }
+              :props="{
+                type: 'row',
+                hasImg: true,
+                news: company_news1[0]
               }"
-            >
-              <HP_NewsComponent
-                :props="{
-                  type: 'row',
-                  hasImg: true,
-                  news: company_news1[0]
-                }"
-                class="pb-3"
-              ></HP_NewsComponent>
-            </RouterLink>
-            <RouterLink
+              class="pb-3"
+            ></HP_NewsComponent>
+
+            <HP_NewsComponent
               v-if="company_news1[1]"
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news1[1].isForeignNews,
-                  newsId: company_news1[1]._id
-                }
+              :props="{
+                type: 'row',
+                hasImg: true,
+                news: company_news1[1]
               }"
-            >
-              <HP_NewsComponent
-                :props="{
-                  type: 'row',
-                  hasImg: true,
-                  news: company_news1[1]
-                }"
-                class="pb-3"
-              ></HP_NewsComponent>
-            </RouterLink>
+              class="pb-3"
+            ></HP_NewsComponent>
 
             <!-- tin không có ảnh -->
-            <RouterLink
+
+            <HP_NewsComponent
               v-if="company_news2[2]"
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news2[0].isForeignNews,
-                  newsId: company_news2[0]._id
-                }
-              }"
-            >
-              <HP_NewsComponent
-                :props="{ type: 'row', hasImg: false, news: company_news2[0] }"
-                class="border-bottom border-contrast py-2"
-              ></HP_NewsComponent>
-            </RouterLink>
-            <RouterLink
+              :props="{ type: 'row', hasImg: false, news: company_news2[0] }"
+              class="border-bottom border-contrast py-2"
+            ></HP_NewsComponent>
+
+            <HP_NewsComponent
               v-if="company_news2[2]"
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news2[1].isForeignNews,
-                  newsId: company_news2[1]._id
-                }
-              }"
-            >
-              <HP_NewsComponent
-                :props="{ type: 'row', hasImg: false, news: company_news2[1] }"
-                class="border-bottom border-contrast py-2"
-              ></HP_NewsComponent>
-            </RouterLink>
-            <RouterLink
+              :props="{ type: 'row', hasImg: false, news: company_news2[1] }"
+              class="border-bottom border-contrast py-2"
+            ></HP_NewsComponent>
+
+            <HP_NewsComponent
               v-if="company_news2[2]"
-              :to="{
-                name: 'hp_news_view',
-                params: {
-                  isForeign: !!company_news2[2].isForeignNews,
-                  newsId: company_news2[2]._id
-                }
-              }"
-            >
-              <HP_NewsComponent
-                :props="{ type: 'row', hasImg: false, news: company_news2[2] }"
-                class="py-2"
-              ></HP_NewsComponent>
-            </RouterLink>
+              :props="{ type: 'row', hasImg: false, news: company_news2[2] }"
+              class="py-2"
+            ></HP_NewsComponent>
           </div>
           <RouterLink
             :to="{ name: 'hp_news_view', params: { isForeign: false } }"
             class="d-inline-block position-absolute fw-bolder text-info hoverRed"
-            style="bottom: -10px"
+            style="bottom: -10px; width: 145px"
             >Xem thêm tin tức</RouterLink
           >
         </div>
@@ -271,22 +216,15 @@ onUpdated(() => {
           class="col-4 d-none d-lg-block p-0"
           style="margin-right: -15px; background-color: #aed9ff; border-radius: 10px"
         >
-          <RouterLink
-            v-if="newses && foreign_news[0]"
-            :to="{
-              name: 'hp_news_view',
-              params: { isForeign: !!foreign_news[0].isForeignNews, newsId: foreign_news[0]._id }
+          <HP_NewsComponent
+            v-if="foreign_news"
+            :props="{
+              type: 'col',
+              hasImg: true,
+              news: foreign_news[0]
             }"
-          >
-            <HP_NewsComponent
-              :props="{
-                type: 'col',
-                hasImg: true,
-                news: foreign_news[0]
-              }"
-              class="p-4"
-            ></HP_NewsComponent>
-          </RouterLink>
+            class="p-4"
+          ></HP_NewsComponent>
 
           <RouterLink
             :to="{ name: 'hp_news_view', params: { isForeign: true } }"

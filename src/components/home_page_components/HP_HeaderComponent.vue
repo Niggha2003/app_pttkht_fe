@@ -95,7 +95,7 @@ navbar_items.value[activeIndex].active = true
           <span
             v-if="header_info.type == 'span'"
             class="d-flex align-items-center"
-            style="color: white; padding: 8px 10px; margin-right: 5px"
+            style="color: white !important; padding: 8px 10px; margin-right: 5px"
           >
             <span :class="header_info.icon" style="margin-right: 3px"></span>
             {{ header_info.text }}
@@ -104,7 +104,7 @@ navbar_items.value[activeIndex].active = true
           <RouterLink
             :to="header_info.to"
             v-if="header_info.type == 'link'"
-            style="color: white; padding: 8px 10px; margin-right: 5px"
+            style="color: white !important; padding: 8px 10px; margin-right: 5px"
           >
             <span :class="header_info.icon" style="margin-right: 3px"></span>
             {{ header_info.text }}

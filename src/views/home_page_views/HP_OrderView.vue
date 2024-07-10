@@ -7,69 +7,73 @@ import DataView from 'primevue/dataview'
 
 import HP_HeaderComponent from '@/components/home_page_components/HP_HeaderComponent.vue'
 import HP_FooterComponent from '@/components/home_page_components/HP_FooterComponent.vue'
-import HP_ContentEditorComponent from '@/components/home_page_components/introduce/HP_ContentEditorComponent.vue'
+import HP_ContentEditorComponent from '@/components/home_page_components/content/HP_ContentEditorComponent.vue'
 
+import importImage from '@/helpers/importImage'
 import modifyDate from '@/helpers/modifyDate'
 
-const props = defineProps(['newsId', 'isForeign'])
-const newsId = props.newsId
-const orders = ref(null)
-const newses = ref([])
-const isForeign = props.isForeign
-const news = ref()
+const formatCurrency = (value) => {
+  value = value * 1000
+  return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+}
 
-// không cho người dùng chỉnh sửa trang news
+const props = defineProps(['orderId'])
+const orderId = props.orderId
+const orders = ref([])
+const order = ref(null)
+
+// không cho người dùng chỉnh sửa trang orders
 const isModify = false
 
+const orderTypes = {
+  ck: 'Cơ khí',
+  dm: 'Dệt may',
+  os: 'Giúp việc',
+  bv: 'Bốc vác'
+}
+
 onBeforeMount(async () => {
-  await getNews(newsId)
-  await getNewses()
   await getOrders()
+  if (orderId) {
+    await getOrder(orderId)
+  }
 })
 
-const getNewses = async () => {
-  const quantity = newses.value.length + 10
-  newses.value = await get('/news')
-  newses.value = newses.value
-    .filter((news) => !!news.isForeignNews == JSON.parse(isForeign))
-    .reverse()
-    .splice(0, quantity)
-}
-
-const getNews = async (id) => {
-  news.value = await get(`/news/${id}`)
-}
-
 const getOrders = async () => {
+  const quantity = orders.value.length + 10
   orders.value = await get('/order/order')
-  orders.value = orders.value.reverse().splice(0, 6)
+  orders.value = orders.value.reverse().splice(0, quantity)
+}
+
+const getOrder = async (id) => {
+  order.value = await get(`/order/order/${id}`)
 }
 </script>
 
 <template>
   <HP_HeaderComponent :activeIndex="2"></HP_HeaderComponent>
-  <template v-if="newsId">
+  <template v-if="orderId">
     <HP_ContentEditorComponent
-      v-if="news"
-      v-model:orders="orders"
+      v-if="order"
+      :orders="orders"
       v-model:isHomePageModify="isModify"
-      v-model:content="news.paragraph"
-      :time="news.timeOutstandingRelease ? news.timeOutstandingRelease : null"
+      v-model:content="order.paragraph"
+      :time="order.timePosted ? order.timePosted : null"
     ></HP_ContentEditorComponent>
   </template>
-  <template v-if="!newsId">
-    <div v-if="newses" style="margin: 40px 0">
+  <template v-if="!orderId">
+    <div v-if="orders" style="margin: 40px 0">
       <div class="d-flex justify-content-center">
         <div class="container row justify-content-around">
           <div
-            class="col-8 card border-0"
+            class="col-12 card border-0"
             style="background-color: white; min-height: 100vh; box-shadow: 0 0 10px #ccc"
           >
             <div class="fs-3 text-danger fw-bolder p-4 border-bottom border-danger mb-2">
               Công ty xuất khẩu lao động ...
             </div>
-            <div class="news">
-              <DataView :value="newses">
+            <div class="orders">
+              <DataView :value="orders">
                 <template #list="slotProps">
                   <div class="flex flex-column">
                     <div v-for="(item, index) in slotProps.items" :key="index">
@@ -82,14 +86,14 @@ const getOrders = async () => {
                         <div class="md:w-40 relative" style="max-width: 250px">
                           <RouterLink
                             :to="{
-                              name: 'hp_news_view',
-                              params: { isForeign: !!item.isForeignNews, newsId: item._id }
+                              name: 'hp_order_view',
+                              params: { orderId: item._id }
                             }"
                           >
                             <img
                               class="block xl:block mx-auto rounded"
-                              :src="item.pictureBase64"
-                              :alt="item.title"
+                              :src="importImage('/order', `${item.photo}`)"
+                              :alt="item.orderName"
                               style="width: 100%; padding: 10px; box-shadow: 0 0 5px #ccc"
                             />
                           </RouterLink>
@@ -102,42 +106,56 @@ const getOrders = async () => {
                           >
                             <div>
                               <span
-                                :class="
-                                  'font-medium text-surface-500 dark:text-surface-400 text-sm ' +
-                                  (item.type == 'focal' ? 'text-warning' : 'text-danger')
-                                "
-                                >{{ item.type == 'focal' ? 'Tiêu điểm' : 'Tin tức nổi bật' }}
+                                :class="'font-medium text-surface-500 dark:text-surface-400 text-sm text-success'"
+                                >{{ orderTypes[item.type] }}
                               </span>
                               <RouterLink
                                 :to="{
-                                  name: 'hp_news_view',
-                                  params: { isForeign: !!item.isForeignNews, newsId: item._id }
+                                  name: 'hp_order_view',
+                                  params: { orderId: item._id }
                                 }"
                                 class="d-block text-lg fw-bolder mt-2 hoverRed"
-                                >{{ item.title }}
+                                >{{ item.orderName }}
                               </RouterLink>
-                              <div
-                                v-if="item.timeOutstandingRelease"
-                                class="d-flex align-items-center mt-2"
-                              >
-                                <span
-                                  class="pi pi-clock me-2"
-                                  style="font-size: 11px; color: #888"
-                                ></span>
-                                <span style="margin-top: -3px; font-size: 11px; color: #888">{{
-                                  modifyDate(item.timeOutstandingRelease)
-                                }}</span>
-                              </div>
                             </div>
-                            <div class="bg-surface-100" style="border-radius: 30px">
-                              <div
-                                class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
-                                style="color: #787878"
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
+                              style="color: #787878"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Thời gian đăng bài: {{ modifyDate(item.timePosted) }}
+                              </span>
+                            </div>
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
+                              style="color: #787878"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Thời gian cần xuất khẩu: {{ modifyDate(item.timeNeeded) }}
+                              </span>
+                            </div>
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
+                              style="color: #787878"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Địa chỉ: {{ item.companyAddress }}
+                              </span>
+                            </div>
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1 text-danger"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Lương: {{ formatCurrency(item.salary) }}
+                              </span>
+                            </div>
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
+                              style="color: #787878"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Công việc: {{ item.jobDescription }}</span
                               >
-                                <span class="content text-surface-900 font-medium text-sm">{{
-                                  item.content
-                                }}</span>
-                              </div>
                             </div>
                           </div>
                         </div>
@@ -149,39 +167,17 @@ const getOrders = async () => {
               <div class="d-flex justify-content-end">
                 <Button
                   class="m-4"
-                  label="Xem thêm tin tức"
+                  label="Xem thêm công việc"
                   severity="help"
                   text
                   @click="
                     async () => {
-                      await getNewses()
+                      await getOrders()
                     }
                   "
                 />
               </div>
             </div>
-          </div>
-          <div
-            v-if="orders"
-            class="col-3 card border-0"
-            style="
-              background-color: white;
-              min-height: 300px;
-              max-height: 500px;
-              box-shadow: 0 0 10px #ccc;
-            "
-          >
-            <div
-              class="fs-4 text-danger fw-bolder p-3 border-bottom border-danger d-flex align-align-items-center"
-            >
-              <span class="pi pi-bell fs-4 me-3 fw-bolder"></span>
-              <span style="margin-top: -3px">Đơn hàng lựa chọn</span>
-            </div>
-            <ul>
-              <li class="fs-6 fw-bolder text-contrast m-3" v-for="order in orders" :key="order">
-                {{ order.orderName }}
-              </li>
-            </ul>
           </div>
         </div>
       </div>

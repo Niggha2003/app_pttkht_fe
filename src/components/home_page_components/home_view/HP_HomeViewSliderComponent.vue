@@ -73,12 +73,12 @@ updateFunction.value = async () => {
       class="card d-flex align-items-center container border-0"
       style="margin: auto"
     >
-      <div v-if="isHomePageModify" style="position: absolute; top: 5px; right: 10px">
+      <div v-if="isHomePageModify && focalNews" style="position: absolute; top: 5px; right: 10px">
         <HP_NewsMultiSelectComponent
           style="width: 200px !important"
           v-model:choices="focalNewsShow"
           v-model:options="focalNews"
-          :optionsLabel="'title'"
+          :optionsLabel="'focalTitle'"
           :placeholder="'Tiêu điểm'"
           :selectionLimit="6"
         ></HP_NewsMultiSelectComponent>
@@ -115,7 +115,7 @@ updateFunction.value = async () => {
                 />
               </div>
             </div>
-            <div class="mb-4" style="width: 49%; text-transform: capitalize">
+            <div class="mb-4 position-relative" style="width: 49%; text-transform: capitalize">
               <div
                 class="fs-2 text-danger fw-bolder"
                 style="padding-bottom: 5px; border-bottom: solid 2px #fad8d8"
@@ -126,6 +126,17 @@ updateFunction.value = async () => {
                 {{ slotProps.data.title }}
               </div>
               <div class="fs-6 content my-2">{{ slotProps.data.content }}</div>
+
+              <RouterLink
+                :to="{
+                  name: 'hp_news_view',
+                  params: { isForeign: !!slotProps.data.isForeignNews, newsId: slotProps.data._id }
+                }"
+                class="d-inline-block position-absolute"
+                style="bottom: 0; left: 0"
+              >
+                <Button class="rounded" label="Xem chi tiết" severity="danger" />
+              </RouterLink>
             </div>
           </div>
         </template>

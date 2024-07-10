@@ -25,11 +25,21 @@ const news = ref(attrs.news)
     :class="`news p-0 ${attrs.type == 'row' ? 'row' : 'col'}`"
     style="text-transform: capitalize"
   >
-    <img
+    <RouterLink
       v-if="attrs.hasImg"
-      :src="news.pictureBase64"
-      :class="attrs.type == 'row' ? 'col-4 rounded p-0 me-3' : 'w-100 rounded mb-1'"
-    />
+      class="d-inline-block"
+      :class="attrs.type == 'row' ? 'col-4  p-0 me-3' : 'w-100  mb-1'"
+      :to="{
+        name: 'hp_news_view',
+        params: {
+          isForeign: !!news.isForeignNews,
+          newsId: news._id
+        }
+      }"
+    >
+      <img :src="news.pictureBase64" class="w-full rounded" />
+    </RouterLink>
+
     <div v-if="display == 0" class="time col-4 d-flex align-items-center">
       <span class="pi pi-clock me-2" style="font-size: 13px"></span>
       <span style="margin-top: -3px">{{ modifyDate(news.timeOutstandingRelease) }}</span>
@@ -38,7 +48,18 @@ const news = ref(attrs.news)
       <div
         :class="`title my-1 ${display == 1 ? 'fs-5 fw-bolder' : display == 2 ? 'fs-6 fw-bolder' : 'fs-6'}`"
       >
-        {{ news.title }}
+        <RouterLink
+          class="d-inline-block"
+          :to="{
+            name: 'hp_news_view',
+            params: {
+              isForeign: !!news.isForeignNews,
+              newsId: news._id
+            }
+          }"
+        >
+          {{ news.title }}
+        </RouterLink>
       </div>
       <div v-if="display != 0" class="time d-flex align-items-center">
         <span class="pi pi-clock me-2" style="font-size: 13px"></span>

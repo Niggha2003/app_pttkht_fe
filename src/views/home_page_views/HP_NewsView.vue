@@ -7,7 +7,7 @@ import DataView from 'primevue/dataview'
 
 import HP_HeaderComponent from '@/components/home_page_components/HP_HeaderComponent.vue'
 import HP_FooterComponent from '@/components/home_page_components/HP_FooterComponent.vue'
-import HP_ContentEditorComponent from '@/components/home_page_components/introduce/HP_ContentEditorComponent.vue'
+import HP_ContentEditorComponent from '@/components/home_page_components/content/HP_ContentEditorComponent.vue'
 
 import modifyDate from '@/helpers/modifyDate'
 
@@ -22,7 +22,9 @@ const news = ref()
 const isModify = false
 
 onBeforeMount(async () => {
-  await getNews(newsId)
+  if (newsId) {
+    await getNews(newsId)
+  }
   await getNewses()
   await getOrders()
 })
@@ -51,7 +53,7 @@ const getOrders = async () => {
   <template v-if="newsId">
     <HP_ContentEditorComponent
       v-if="news"
-      v-model:orders="orders"
+      :orders="orders"
       v-model:isHomePageModify="isModify"
       v-model:content="news.paragraph"
       :time="news.timeOutstandingRelease ? news.timeOutstandingRelease : null"
