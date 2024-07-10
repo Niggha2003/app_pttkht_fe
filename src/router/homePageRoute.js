@@ -10,13 +10,24 @@ export default [
     component: () => import('@/views/home_page_views/HP_IntroView.vue')
   },
   {
-    path: '/order',
+    path: '/order/:orderId?',
     name: 'hp_order_view',
-    component: () => import('@/views/home_page_views/HP_OrderView.vue')
+    component: () => import('@/views/home_page_views/HP_OrderView.vue'),
+    props: (route) => {
+      return { ...route.params }
+    }
   },
   {
     path: '/form',
     name: 'hp_form_view',
     component: () => import('@/views/home_page_views/HP_FormView.vue')
+  },
+  {
+    path: '/news/:isForeign?/:newsId?',
+    name: 'hp_news_view',
+    component: () => import('@/views/home_page_views/HP_NewsView.vue'),
+    props: (route) => {
+      return { ...route.params }
+    }
   }
 ]

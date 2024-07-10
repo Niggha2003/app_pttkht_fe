@@ -170,7 +170,7 @@ updateFunction.value = async () => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .hoverRed:hover {
   color: rgb(251, 40, 40) !important;
 }

@@ -3,12 +3,16 @@ import Quill from 'quill'
 import ImageUploader from 'quill-image-uploader'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
+import modifyDate from '@/helpers/modifyDate'
 
 import Editor from 'primevue/editor'
 
 const newses = defineModel('newses')
+const orders = defineModel('orders')
 const isHomePageModify = defineModel('isHomePageModify')
-const introduce = defineModel('introduce')
+const content = defineModel('content')
+const props = defineProps(['time'])
+const time = props.time
 
 // Custom fonts cho quill
 const fonts = ['Arial', 'Verdana', 'Times', 'Courier']
@@ -66,32 +70,39 @@ const modules = {
 
 <template>
   <div class="intro__content" style="margin: 40px 0">
-    <div v-show="isHomePageModify" v-if="introduce" class="card">
+    <div v-show="isHomePageModify" v-if="content" class="card">
       <Editor
-        v-model="introduce.text"
+        v-model="content"
         editorStyle="height: 320px, width: 50%"
         :modules="modules"
         :pt="{ toolbar: { style: 'display: none;' } }"
         theme="snow"
         @load="
           ({ instance }) => {
-            instance.root.innerHTML = introduce.text
+            instance.root.innerHTML = content
           }
         "
       />
     </div>
-    <div v-if="introduce && !isHomePageModify" class="d-flex justify-content-center">
+    <div v-if="content && !isHomePageModify" class="d-flex justify-content-center">
       <div class="container row justify-content-around">
         <div
           class="col-8 card border-0"
           style="background-color: white; min-height: 100vh; box-shadow: 0 0 10px #ccc"
         >
-          <div class="intro__title fs-3 text-danger fw-bolder p-4 border-bottom border-danger">
+          <div class="intro__title fs-3 text-danger fw-bolder p-4 border-bottom border-danger mb-2">
             Công ty xuất khẩu lao động ...
           </div>
-          <div class="ql-editor" v-html="introduce.text"></div>
+          <div class="d-flex align-items-center justify-content-end pe-3 my-3" v-if="time">
+            <span class="pi pi-clock me-2" style="font-size: 13px; color: #888"></span>
+            <span style="margin-top: -3px; color: #888; font-size: 13px">{{
+              modifyDate(time)
+            }}</span>
+          </div>
+          <div class="ql-editor" v-html="content"></div>
         </div>
         <div
+          v-if="newses"
           class="col-3 card border-0"
           style="
             background-color: white;
@@ -109,6 +120,28 @@ const modules = {
           <ul>
             <li class="fs-6 fw-bolder text-contrast m-3" v-for="news in newses" :key="news">
               {{ news.title }}
+            </li>
+          </ul>
+        </div>
+        <div
+          v-if="orders"
+          class="col-3 card border-0"
+          style="
+            background-color: white;
+            min-height: 300px;
+            max-height: 500px;
+            box-shadow: 0 0 10px #ccc;
+          "
+        >
+          <div
+            class="fs-4 text-danger fw-bolder p-3 border-bottom border-danger d-flex align-items-center"
+          >
+            <span class="pi pi-bell fs-4 me-3 fw-bolder"></span>
+            <span style="margin-top: -3px">Đơn hàng lựa chọn</span>
+          </div>
+          <ul>
+            <li class="fs-6 fw-bolder text-contrast m-3" v-for="order in orders" :key="order">
+              {{ order.orderName }}
             </li>
           </ul>
         </div>

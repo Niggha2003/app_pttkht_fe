@@ -47,7 +47,7 @@ const getOrders = async () => {
 </script>
 
 <template>
-  <HP_HeaderComponent :activeIndex="2"></HP_HeaderComponent>
+  <HP_HeaderComponent :activeIndex="0"></HP_HeaderComponent>
   <template v-if="newsId">
     <HP_ContentEditorComponent
       v-if="news"
