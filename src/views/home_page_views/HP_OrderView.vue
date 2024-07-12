@@ -51,7 +51,7 @@ const getOrder = async (id) => {
 </script>
 
 <template>
-  <HP_HeaderComponent :activeIndex="2"></HP_HeaderComponent>
+  <HP_HeaderComponent :activeIndex="3"></HP_HeaderComponent>
   <template v-if="orderId">
     <HP_ContentEditorComponent
       v-if="order"
@@ -59,6 +59,7 @@ const getOrder = async (id) => {
       v-model:isHomePageModify="isModify"
       v-model:content="order.paragraph"
       :time="order.timePosted ? order.timePosted : null"
+      :orderCode="order.orderCode"
     ></HP_ContentEditorComponent>
   </template>
   <template v-if="!orderId">
@@ -117,6 +118,14 @@ const getOrder = async (id) => {
                                 class="d-block text-lg fw-bolder mt-2 hoverRed"
                                 >{{ item.orderName }}
                               </RouterLink>
+                            </div>
+                            <div
+                              class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"
+                              style="color: #787878"
+                            >
+                              <span class="content text-surface-900 font-medium text-sm">
+                                Mã số đơn hàng: {{ item.orderCode }}
+                              </span>
                             </div>
                             <div
                               class="bg-surface-0 flex align-items-center gap-2 justify-content-center py-1"

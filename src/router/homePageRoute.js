@@ -18,9 +18,12 @@ export default [
     }
   },
   {
-    path: '/form',
+    path: '/form/:orderCode?',
     name: 'hp_form_view',
-    component: () => import('@/views/home_page_views/HP_FormView.vue')
+    component: () => import('@/views/home_page_views/HP_FormView.vue'),
+    props: (route) => {
+      return { ...route.params }
+    }
   },
   {
     path: '/news/:isForeign?/:newsId?',

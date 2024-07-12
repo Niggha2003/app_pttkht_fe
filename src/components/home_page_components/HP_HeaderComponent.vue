@@ -66,6 +66,16 @@ const navbar_items = ref([
     }
   },
   {
+    label: 'Tin tức',
+    active: false,
+    to: {
+      name: 'hp_news_view',
+      params: {
+        isForeign: false
+      }
+    }
+  },
+  {
     label: 'Xuất khẩu lao động',
     active: false,
     to: {
@@ -73,7 +83,7 @@ const navbar_items = ref([
     }
   },
   {
-    label: 'Đăng ký form',
+    label: 'Form đăng kí',
     active: false,
     to: {
       name: 'hp_form_view'

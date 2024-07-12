@@ -49,7 +49,7 @@ const getOrders = async () => {
 </script>
 
 <template>
-  <HP_HeaderComponent :activeIndex="0"></HP_HeaderComponent>
+  <HP_HeaderComponent :activeIndex="2"></HP_HeaderComponent>
   <template v-if="newsId">
     <HP_ContentEditorComponent
       v-if="news"
@@ -181,7 +181,12 @@ const getOrders = async () => {
             </div>
             <ul>
               <li class="fs-6 fw-bolder text-contrast m-3" v-for="order in orders" :key="order">
-                {{ order.orderName }}
+                <RouterLink
+                  class="hoverRed"
+                  :to="{ name: 'hp_order_view', params: { orderId: order._id } }"
+                >
+                  {{ order.orderName }}
+                </RouterLink>
               </li>
             </ul>
           </div>

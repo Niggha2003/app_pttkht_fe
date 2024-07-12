@@ -192,7 +192,7 @@ const handleUpdateInfo = async () => {
           autocomplete="off"
         />
       </div>
-      <div class="flex justify-items-end gap-2">
+      <div class="flex justify-content-end gap-2">
         <Button
           type="button"
           label="Cancel"

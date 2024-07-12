@@ -50,12 +50,12 @@
   }
   ul li a:hover {
     background-color: #c0c6ca;
-    color: #38474d;
+    color: #38474d !important;
     transition: 0.5s;
   }
   ul li.active > a {
     background-color: #c0c6ca;
-    color: #38474d;
+    color: #38474d !important;
     transition: 0.5s;
   }
   a {

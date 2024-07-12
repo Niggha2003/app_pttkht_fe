@@ -9,10 +9,11 @@ import Editor from 'primevue/editor'
 
 const isHomePageModify = defineModel('isHomePageModify')
 const content = defineModel('content')
-const props = defineProps(['time', 'orders', 'newses'])
+const props = defineProps(['time', 'orders', 'newses', 'orderCode'])
 const time = props.time
 const newses = ref(props.newses)
 const orders = ref(props.orders)
+const orderCode = ref(props.orderCode)
 
 if (newses.value) {
   newses.value = newses.value.splice(0, 6)
@@ -20,6 +21,7 @@ if (newses.value) {
 if (orders.value) {
   orders.value = orders.value.splice(0, 6)
 }
+console.log(newses.value, orders.value)
 
 // Custom fonts cho quill
 const fonts = ['Arial', 'Verdana', 'Times', 'Courier']
@@ -94,8 +96,13 @@ const modules = {
     <div v-if="content && !isHomePageModify" class="d-flex justify-content-center">
       <div class="container row justify-content-around">
         <div
-          class="col-8 card border-0"
-          style="background-color: white; min-height: 100vh; box-shadow: 0 0 10px #ccc"
+          class="col-8 card border-0 position-relative"
+          style="
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px #ccc;
+            padding-bottom: 40px;
+          "
         >
           <div class="intro__title fs-3 text-danger fw-bolder p-4 border-bottom border-danger mb-2">
             Công ty xuất khẩu lao động ...
@@ -107,6 +114,17 @@ const modules = {
             }}</span>
           </div>
           <div class="ql-editor" v-html="content"></div>
+          <RouterLink
+            v-if="orderCode"
+            :to="{ name: 'hp_form_view', params: { orderCode: orderCode } }"
+          >
+            <Button
+              class="position-absolute"
+              style="bottom: 30px; right: 20px"
+              label="Ứng tuyển đơn hàng này!!!"
+              severity="danger"
+            ></Button>
+          </RouterLink>
         </div>
         <div
           v-if="newses"

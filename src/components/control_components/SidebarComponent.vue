@@ -26,41 +26,6 @@ const handleMenuItemChildClick = (index, childIndex) => {
   menu.value = MenuItemChildChange(menu.value, index, childIndex)
   store.commit('changeMenu', menu.value)
 }
-
-// const handleResizeMousedown = (e) => {
-//   if (e.clientX < 3 + e.target.clientWidth && e.clientX > +e.target.clientWidth - 3) {
-//     isResizing = true
-//   } else {
-//     return
-//   }
-// }
-
-// onMounted(() => {
-//   if (sidebar.value) {
-//     window.addEventListener('mousemove', (e) => {
-//       if (e.clientX < 3 + sidebar.value.clientWidth && e.clientX > +sidebar.value.clientWidth - 3) {
-//         document.documentElement.style.cursor = 'ew-resize'
-//       } else {
-//         if (isResizing) {
-//           document.documentElement.style.cursor = 'ew-resize'
-//           sidebar.value.style.width = `${e.clientX}px`
-//         } else {
-//           document.documentElement.style.cursor = 'default'
-//         }
-//       }
-//     })
-
-//     window.addEventListener('mouseup', (e) => {
-//       if (isResizing) {
-//         isResizing = false
-//         document.documentElement.style.cursor = 'default'
-//         sidebar.value.style.width = `${e.clientX}px`
-//       } else {
-//         return
-//       }
-//     })
-//   }
-// })
 </script>
 
 <template>

@@ -45,7 +45,7 @@ const getNews = async () => {
   ></HP_ModifyComponent>
   <HP_HeaderComponent :activeIndex="1"></HP_HeaderComponent>
   <HP_ContentEditorComponent
-    v-if="introduce"
+    v-if="introduce && newses"
     :newses="newses"
     v-model:isHomePageModify="isHomePageModify"
     v-model:content="introduce.text"

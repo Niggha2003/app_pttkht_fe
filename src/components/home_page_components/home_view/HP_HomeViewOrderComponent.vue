@@ -102,8 +102,13 @@ updateFunction.value = async () => {
           }"
         >
           <template #body="slotProps">
-            {{ slotProps.data.orderName }}
-            <Tag icon="pi pi-bolt" value="HOT" severity="danger" />
+            <RouterLink
+              class="hoverRed"
+              :to="{ name: 'hp_order_view', params: { orderId: slotProps.data._id } }"
+            >
+              {{ slotProps.data.orderName }}
+              <Tag class="ms-4" icon="pi pi-bolt" value="HOT" severity="danger" />
+            </RouterLink>
           </template>
         </Column>
         <Column
@@ -171,7 +176,8 @@ updateFunction.value = async () => {
 </template>
 
 <style scoped>
-.hoverRed:hover {
+.hoverRed:hover,
+.hoverRed:hover > span {
   color: rgb(251, 40, 40) !important;
 }
 </style>
