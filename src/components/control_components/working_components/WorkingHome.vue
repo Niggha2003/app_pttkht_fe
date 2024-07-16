@@ -161,11 +161,11 @@ const columns = [
     }
   },
   {
-    header: 'Xóa khỏi danh sách đen',
+    header: 'Thêm vào danh sách đen',
     width: '17.5%',
     filterField: null,
     type: 'button',
-    label: 'Xóa khỏi danh sách đen',
+    label: 'Thêm vào danh sách đen',
     severity: 'danger',
     icon: 'pi pi-times',
     buttonFunction: (data) => {
@@ -176,7 +176,7 @@ const columns = [
 </script>
 
 <template>
-  <div v-if="!isWorkerShow && !isWorkerAdd" class="worker__list card p-4">
+  <div v-if="!isWorkerShow && !isWorkerAdd" class="worker__list card p-4 mb-6">
     <div class="d-flex flex-row-reverse mb-3">
       <Button
         icon="pi pi-plus"
@@ -202,7 +202,7 @@ const columns = [
     >
     </ListComponent>
   </div>
-  <div v-if="isWorkerAdd" class="card p-4">
+  <div v-if="isWorkerAdd" class="card p-4 mb-6">
     <div class="d-flex justify-content-start pe-5">
       <div
         @click="
@@ -220,7 +220,7 @@ const columns = [
       <worker-add-component> </worker-add-component>
     </keep-alive>
   </div>
-  <div v-if="isWorkerShow" class="card pt-3">
+  <div v-if="isWorkerShow" class="card pt-3 mb-6">
     <div class="d-flex justify-content-between my-2 pe-5">
       <div
         @click="
@@ -251,7 +251,7 @@ const columns = [
         Sửa
       </div>
     </div>
-    <TabView :pt="{ inkbar: { style: 'background-color: #dc3545' } }">
+    <TabView :pt="{ inkbar: { style: 'background-color: #dc3545; height: 3px ' } }">
       <TabPanel
         header="Thông tin cơ bản"
         :pt="{

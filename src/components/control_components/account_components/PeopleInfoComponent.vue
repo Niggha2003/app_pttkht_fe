@@ -172,11 +172,7 @@ const handleChangeModifyMode = (state) => {
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountCode">Tên người dùng tài khoản</label>
-            <InputText
-              id="floatingAccountCode"
-              v-model="account.accountCode"
-              :disabled="isDisabled"
-            />
+            <InputText id="floatingAccountCode" v-model="account.accountCode" :disabled="true" />
           </div>
         </div>
         <div class="col-5 p-0">
@@ -214,7 +210,7 @@ const handleChangeModifyMode = (state) => {
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountName">Tên lao động</label>
+            <label for="floatingAccountName">Tên nhân viên</label>
             <InputText
               id="floatingAccountName"
               class="mb-3"

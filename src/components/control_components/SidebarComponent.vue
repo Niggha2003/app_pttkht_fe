@@ -80,6 +80,7 @@ const handleMenuItemChildClick = (index, childIndex) => {
                   style="display: flex; align-items: center; justify-content: space-between"
                 >
                   <div>
+                    <span class="pi pi-angle-right me-2" style="font-size: 15px !important"></span>
                     <font-awesome-icon :icon="menuItemChild.icon" class="me-1" />
                     {{ menuItemChild.name }}
                   </div>

@@ -107,7 +107,7 @@ const columns = [
     width: '12.5%',
     filterField: null,
     type: 'button',
-    severity: 'info',
+    severity: 'contrast',
     label: 'Xem thông tin',
     icon: 'pi pi-arrow-right',
     buttonFunction: (data) => {
@@ -120,7 +120,7 @@ const columns = [
     filterField: null,
     type: 'button',
     label: 'Xóa khỏi danh sách đen',
-    severity: 'danger',
+    severity: 'success',
     icon: 'pi pi-times',
     buttonFunction: (data) => {
       handleRemoveWorkerToBlackList(data)

@@ -163,7 +163,7 @@ onMounted(() => {
             <InputText
               id="floatingAccountCode"
               v-model="worker.accountTraining.accountCode"
-              :disabled="isDisabled"
+              :disabled="true"
             />
           </div>
         </div>

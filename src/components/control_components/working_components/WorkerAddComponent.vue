@@ -3,6 +3,7 @@
 import { ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 import { onMounted } from 'vue'
+import getHighestCode from '@/helpers/getHighestCode'
 
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
@@ -17,22 +18,22 @@ const addResultVisible = ref(false)
 const worker = ref({
   isMarried: { text: 'Đã kết hôn', state: true },
   accountTraining: {
-    accountCode: '',
-    password: '',
+    accountCode: null,
+    password: null,
     role: 'student',
     person: {
-      name: '',
+      name: null,
       birthDate: new Date(),
-      phoneNumber: '',
+      phoneNumber: null,
       academicLevel: { text: 'Đại học', code: 'dh' },
       anotherCertificates: [],
-      address: '',
+      address: null,
       associateContact: {
-        name: '',
-        relation: '',
-        phoneNumber: ''
+        name: null,
+        relation: null,
+        phoneNumber: null
       },
-      identifyCard: ''
+      identifyCard: null
     }
   }
 })
@@ -100,8 +101,43 @@ const handleAddWorker = async () => {
   }
 }
 
+const resetAddWorker = async () => {
+  // reset kết quả thêm
+  addResult.value = null
+
+  // reset giá trị tài khoản
+  worker.value = {
+    isMarried: { text: 'Đã kết hôn', state: true },
+    accountTraining: {
+      accountCode: await getHighestCode('/working/worker', 'working'),
+      password: null,
+      role: 'student',
+      person: {
+        name: null,
+        birthDate: new Date(),
+        phoneNumber: null,
+        academicLevel: { text: 'Đại học', code: 'dh' },
+        anotherCertificates: [],
+        address: null,
+        associateContact: {
+          name: null,
+          relation: null,
+          phoneNumber: null
+        },
+        identifyCard: null,
+        photo: null,
+        photoType: null
+      }
+    }
+  }
+
+  // reset ảnh
+  imageWorker.value = null
+}
+
 // thay đổi hình ảnh
 onMounted(() => {
+  resetAddWorker()
   handleImageChange = (e) => {
     const fileInput = e.target
     if (fileInput.files && fileInput.files[0]) {
@@ -154,7 +190,11 @@ onMounted(() => {
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountCode">Tên người dùng tài khoản</label>
-            <InputText id="floatingAccountCode" v-model="worker.accountTraining.accountCode" />
+            <InputText
+              id="floatingAccountCode"
+              v-model="worker.accountTraining.accountCode"
+              disabled
+            />
           </div>
         </div>
         <div class="col-5 p-0">
@@ -421,6 +461,18 @@ onMounted(() => {
         </div>
       </fieldset>
     </form>
+    <div
+      v-if="addResult && addResult.status && addResult.status == 200"
+      class="d-flex justify-content-center py-2"
+    >
+      <Button
+        label="Tiếp tục thêm mới lao động"
+        severity="secondary"
+        icon="pi pi-user-plus"
+        iconPos="right"
+        @click="resetAddWorker()"
+      ></Button>
+    </div>
   </div>
 </template>
 

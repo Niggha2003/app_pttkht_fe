@@ -4,25 +4,37 @@ import { ref, onMounted } from 'vue'
 import Chart from 'primevue/chart'
 import Paginator from 'primevue/paginator'
 import { get } from '@/utils/httpRequest'
+import StatisticChartComponent from '../chart_components/StatisticChartComponent.vue'
 
 onMounted(() => {
   getWorkerQuantityDoughnut()
-  chartDataDoughnut.value = setChartDataDoughnut()
-  chartOptionsDoughnut.value = setChartOptionsDoughnut()
 
   getWorkerEfficiencyLine()
   setChart()
 })
 
-const workerQuantityDoughnut = ref([0, 0, 0, 0, 0])
-const chartDataDoughnut = ref()
-const chartOptionsDoughnut = ref(null)
+const workerQuantityDoughnut = ref(null)
 const colorsDoughnut = [
   'rgba(255, 99, 132, 1)', // Red
   'rgba(54, 162, 235, 1)', // Blue
   'rgba(255, 206, 86, 1)', // Yellow
   'rgba(75, 192, 192, 1)', // Green
   'rgba(0, 0, 0, 1)'
+]
+
+const colorsHoverDoughnut = [
+  'rgba(255, 99, 132, 0.4)', // Red
+  'rgba(54, 162, 235, 0.4)', // Blue
+  'rgba(255, 206, 86, 0.4)', // Yellow
+  'rgba(75, 192, 192, 0.4)', // Green
+  'rgba(0, 0, 0, 0.4)'
+]
+const items = [
+  'Đang đào tạo',
+  'Chuẩn bị xuất cảnh',
+  'Ở nước ngoài',
+  'Đã về nước',
+  'Trong danh sách đen'
 ]
 
 const chartDataLine = ref()
@@ -36,6 +48,7 @@ const defaultYear = 2022
 
 const getWorkerQuantityDoughnut = async () => {
   try {
+    workerQuantityDoughnut.value = [0, 0, 0, 0, 0]
     let workers = await get('/working/worker', {})
     if (workers) {
       workers.forEach((w) => {
@@ -51,48 +64,6 @@ const getWorkerQuantityDoughnut = async () => {
     }
   } catch (err) {
     console.log(err)
-  }
-}
-
-const setChartDataDoughnut = () => {
-  return {
-    labels: [
-      'Đang đào tạo',
-      'Chuẩn bị xuất cảnh',
-      'Ở nước ngoài',
-      'Đã về nước',
-      'Trong danh sách đen'
-    ],
-    datasets: [
-      {
-        data: workerQuantityDoughnut.value,
-        hoverBackgroundColor: [
-          'rgba(255, 99, 132, 0.4)', // Red
-          'rgba(54, 162, 235, 0.4)', // Blue
-          'rgba(255, 206, 86, 0.4)', // Yellow
-          'rgba(75, 192, 192, 0.4)', // Green
-          'rgba(0, 0, 0, 0.4)'
-        ],
-        backgroundColor: colorsDoughnut,
-        borderWidth: 0
-      }
-    ]
-  }
-}
-
-const setChartOptionsDoughnut = () => {
-  return {
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          padding: 20,
-          color: 'rgb(255, 99, 132)'
-        }
-      }
-    },
-    cutout: '40%',
-    padding: 20
   }
 }
 
@@ -289,124 +260,14 @@ const setChart = () => {
 </script>
 
 <template>
-  <div
-    class="card mb-6 position-relative d-flex justify-content-center align-items-end"
-    style="background-color: #f2ddb8"
-  >
-    <div
-      style="
-        width: 100%;
-        height: 10px;
-        background-color: white;
-        top: 9.5%;
-        left: 0;
-        position: absolute;
-      "
-    ></div>
-    <div style="position: absolute; left: 2.5%; top: 5%">
-      <div
-        class="fw-bolder fs-4 text-danger"
-        style="
-          padding: 10px 20px;
-          background-color: white;
-          display: inline-block;
-          border-radius: 10px;
-          z-index: 1;
-        "
-      >
-        Thống kê số lượng lao động tùy theo trạng thái:
-      </div>
-      <div
-        class="mt-5 ps-2 fs-6 d-flex flex-wrap justify-content-between align-item-"
-        style="width: 40%; font-weight: 500"
-      >
-        <p class="quantity__item">
-          <span class="quantity__item__border" :style="`background-color: #ccc`"></span>
-          <span class="fs-3 fw-bolder">Tổng :</span>
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3 ms-3"
-            >{{
-              (() => {
-                const sum = workerQuantityDoughnut.reduce(function (total, q) {
-                  return total + q
-                }, 0)
-                return sum
-              })()
-            }}</span
-          >
-        </p>
-        <p class="quantity__item">
-          <span
-            class="quantity__item__border"
-            :style="`background-color: ${colorsDoughnut[0]}`"
-          ></span>
-          Số lao động đang được đào tạo:
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3"
-            >{{ workerQuantityDoughnut[0] }}</span
-          >
-        </p>
-        <p class="quantity__item">
-          <span
-            class="quantity__item__border"
-            :style="`background-color: ${colorsDoughnut[1]}`"
-          ></span>
-          Số lao động chuẩn bị xuất cảnh:
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3"
-            >{{ workerQuantityDoughnut[1] }}</span
-          >
-        </p>
-        <p class="quantity__item">
-          <span
-            class="quantity__item__border"
-            :style="`background-color: ${colorsDoughnut[2]}`"
-          ></span>
-          Số lao động đang ở nước ngoài:
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3"
-            >{{ workerQuantityDoughnut[2] }}</span
-          >
-        </p>
-        <p class="quantity__item">
-          <span
-            class="quantity__item__border"
-            :style="`background-color: ${colorsDoughnut[3]}`"
-          ></span>
-          Số lao động đang đã về nước:
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3"
-            >{{ workerQuantityDoughnut[3] }}</span
-          >
-        </p>
-        <p class="quantity__item">
-          <span
-            class="quantity__item__border"
-            :style="`background-color: ${colorsDoughnut[4]}`"
-          ></span>
-          Số lao động đang trong danh sách đen:
-          <span
-            style="position: absolute; right: 5%; bottom: 5px"
-            class="text-danger fw-bolder fs-3"
-            >{{ workerQuantityDoughnut[4] }}</span
-          >
-        </p>
-      </div>
-    </div>
-
-    <Chart
-      type="doughnut"
-      :data="chartDataDoughnut"
-      :options="chartOptionsDoughnut"
-      class=":w-[30rem]"
-      style="width: 500px; height: 500px; padding: 1%"
-    />
-  </div>
+  <StatisticChartComponent
+    v-if="workerQuantityDoughnut"
+    title="Thống kê số lượng nhân viên"
+    :items="items"
+    :itemQuantities="workerQuantityDoughnut"
+    :itemColors="colorsDoughnut"
+    :itemHoverColors="colorsHoverDoughnut"
+  ></StatisticChartComponent>
   <div
     class="mb-6 card position-relative d-flex justify-content-center align-items-start"
     style="background-color: #f2ddb8"
@@ -453,28 +314,3 @@ const setChart = () => {
     </Paginator>
   </div>
 </template>
-
-<style scoped>
-.quantity__item {
-  padding: 5px 15px;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  width: 200px;
-  height: 100px;
-  margin-bottom: 30px;
-  position: relative;
-  background-color: white;
-  box-shadow: 0 0 3px #ccc;
-}
-
-.quantity__item__border {
-  width: 15px;
-  display: block;
-  height: 100%;
-  border-radius: 100px;
-  position: absolute;
-  top: 0;
-  left: -7.5px;
-  background-color: blue;
-}
-</style>

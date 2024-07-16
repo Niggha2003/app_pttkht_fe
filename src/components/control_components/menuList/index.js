@@ -6,7 +6,7 @@ import {
   faPager
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faList, faChartSimple, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faList, faChartSimple, faBan, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 
 const menu = [
   {
@@ -105,7 +105,7 @@ const menu = [
       {
         name: 'Tạo tài khoản mới',
         active: false,
-        icon: faBan,
+        icon: faUserPlus,
         to: {
           name: 'employee',
           params: {
