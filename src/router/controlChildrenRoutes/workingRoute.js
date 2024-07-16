@@ -1,8 +1,8 @@
-import WorkingHome from '@/components/control_components/working/WorkingHome.vue'
-import WorkingStatistic from '@/components/control_components/working/WorkingStatistic.vue'
-import WorkingBlacklist from '@/components/control_components/working/WorkingBlacklist.vue'
+import WorkingHome from '@/components/control_components/working_components/WorkingHome.vue'
+import WorkingStatistic from '@/components/control_components/working_components/WorkingStatistic.vue'
+import WorkingBlacklist from '@/components/control_components/working_components/WorkingBlacklist.vue'
 
-const workingComponent = [
+const workingComponents = [
   {
     name: 'list',
     com: WorkingHome
@@ -24,7 +24,7 @@ export default {
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent
-    const workingPlace = workingComponent.find(
+    const workingPlace = workingComponents.find(
       (element) => element.name && element.name == route.params.place
     )
     innerComponent = workingPlace.com

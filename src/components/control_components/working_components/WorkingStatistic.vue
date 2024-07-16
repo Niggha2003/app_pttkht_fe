@@ -1,11 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 // import { get } from '@/utils/httpRequest'
-import { useStore } from 'vuex'
 import Chart from 'primevue/chart'
 import Paginator from 'primevue/paginator'
-
-const store = useStore()
+import { get } from '@/utils/httpRequest'
 
 onMounted(() => {
   getWorkerQuantityDoughnut()
@@ -36,35 +34,24 @@ const efficiencies = ref([])
 const workingWorkers = ref(null)
 const defaultYear = 2022
 
-const getWorkerQuantityDoughnut = () => {
-  let workers = store.state.dataNeeded.worker_list
-  workers.forEach((w) => {
-    if (w.isBanned) {
-      workerQuantityDoughnut.value[4]++
-    } else {
-      if (w.state == 'training') workerQuantityDoughnut.value[0]++
-      if (w.state == 'prepared') workerQuantityDoughnut.value[1]++
-      if (w.state == 'abroad') workerQuantityDoughnut.value[2]++
-      if (w.state == 'back') workerQuantityDoughnut.value[3]++
+const getWorkerQuantityDoughnut = async () => {
+  try {
+    let workers = await get('/working/worker', {})
+    if (workers) {
+      workers.forEach((w) => {
+        if (w.isBanned) {
+          workerQuantityDoughnut.value[4]++
+        } else {
+          if (w.state == 'training') workerQuantityDoughnut.value[0]++
+          if (w.state == 'prepared') workerQuantityDoughnut.value[1]++
+          if (w.state == 'abroad') workerQuantityDoughnut.value[2]++
+          if (w.state == 'back') workerQuantityDoughnut.value[3]++
+        }
+      })
     }
-  })
-  // try {
-  //   let workers = await get('/working/worker', {})
-  //   if (workers) {
-  //     workers.forEach((w) => {
-  //       if (w.isBanned) {
-  //         workerQuantityDoughnut.value[4]++
-  //       } else {
-  //         if (w.state == 'training') workerQuantityDoughnut.value[0]++
-  //         if (w.state == 'prepared') workerQuantityDoughnut.value[1]++
-  //         if (w.state == 'abroad') workerQuantityDoughnut.value[2]++
-  //         if (w.state == 'back') workerQuantityDoughnut.value[3]++
-  //       }
-  //     })
-  //   }
-  // } catch (err) {
-  //   console.log(err)
-  // }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const setChartDataDoughnut = () => {
@@ -249,86 +236,50 @@ const getWorkerEfficiencyLine = async () => {
       })
     }
   }
-  let workers = store.state.dataNeeded.worker_list
-  workingWorkers.value = workers.filter((w) => w.state == 'abroad' || w.state == 'back')
-  workingWorkers.value.forEach((w) => {
-    const goAbroadDate = new Date(w.timeGoAbroad)
-    w.efficiency.forEach((ef) => {
-      // thời gian sau khi xuất cảnh được ef.tháng
-      const currentDate = new Date(w.timeGoAbroad)
-      currentDate.setMonth(goAbroadDate.getMonth() + ef.month)
-      const yearIndex = efficiencies.value.findIndex((c) => c.year == currentDate.getFullYear())
-      if (yearIndex != -1) {
-        const dataIndex = efficiencies.value[yearIndex].data.findIndex(
-          (c) => c.month == currentDate.getMonth()
-        )
-        if (
-          dataIndex != -1 &&
-          ef.offTimes != null &&
-          ef.attitude != null &&
-          ef.percentKPIReached != null
-        ) {
-          efficiencies.value[yearIndex].data[dataIndex].quantity++
-          const quantity = efficiencies.value[yearIndex].data[dataIndex].quantity
-          efficiencies.value[yearIndex].data[dataIndex].offTimes =
-            (efficiencies.value[yearIndex].data[dataIndex].offTimes * (quantity - 1) +
-              ef.offTimes) /
-            quantity
-          efficiencies.value[yearIndex].data[dataIndex].attitude =
-            (efficiencies.value[yearIndex].data[dataIndex].attitude * (quantity - 1) +
-              ef.attitude) /
-            quantity
-          efficiencies.value[yearIndex].data[dataIndex].percentKPIReached =
-            (efficiencies.value[yearIndex].data[dataIndex].percentKPIReached * (quantity - 1) +
-              ef.percentKPIReached) /
-            quantity
-        }
-      }
-    })
-  })
-  // try {
-  //   let workers = await get('/working/worker', {})
-  //   if (workers) {
-  //     workingWorkers.value = workers.filter((w) => w.state == 'abroad' || w.state == 'back')
-  //     workingWorkers.value.forEach((w) => {
-  //       const goAbroadDate = new Date(w.timeGoAbroad)
-  //       w.efficiency.forEach((ef) => {
-  //         // thời gian sau khi xuất cảnh được ef.tháng
-  //         const currentDate = goAbroadDate
-  //         currentDate.setMonth(goAbroadDate.getMonth() + ef.month)
-  //         const yearIndex = efficiencies.value.findIndex((c) => c.year == currentDate.getFullYear())
-  //         if (yearIndex != -1) {
-  //           const dataIndex = efficiencies.value[yearIndex].data.findIndex(
-  //             (c) => c.month == currentDate.getMonth()
-  //           )
-  //           if (
-  //             dataIndex != -1 &&
-  //             ef.offTimes != null &&
-  //             ef.attitude != null &&
-  //             ef.percentKPIReached != null
-  //           ) {
-  //             efficiencies.value[yearIndex].data[dataIndex].quantity++
-  //             const quantity = efficiencies.value[yearIndex].data[dataIndex].quantity
-  //             efficiencies.value[yearIndex].data[dataIndex].offTimes =
-  //               (efficiencies.value[yearIndex].data[dataIndex].offTimes * (quantity - 1) +
-  //                 ef.offTimes) /
-  //               quantity
-  //             efficiencies.value[yearIndex].data[dataIndex].attitude =
-  //               (efficiencies.value[yearIndex].data[dataIndex].attitude * (quantity - 1) +
-  //                 ef.attitude) /
-  //               quantity
-  //             efficiencies.value[yearIndex].data[dataIndex].percentKPIReached =
-  //               (efficiencies.value[yearIndex].data[dataIndex].percentKPIReached * (quantity - 1) +
-  //                 ef.percentKPIReached) /
-  //               quantity
-  //           }
-  //         }
-  //       })
-  //     })
-  //   }
-  // } catch (err) {
-  //   console.log(err)
-  // }
+  // lấy dữ liệu các lao động tùy theo từng tháng
+  try {
+    let workers = await get('/working/worker', {})
+    if (workers) {
+      workingWorkers.value = workers.filter((w) => w.state == 'abroad' || w.state == 'back')
+      workingWorkers.value.forEach((w) => {
+        const goAbroadDate = new Date(w.timeGoAbroad)
+        w.efficiency.forEach((ef) => {
+          // thời gian sau khi xuất cảnh được ef.tháng
+          const currentDate = goAbroadDate
+          currentDate.setMonth(goAbroadDate.getMonth() + ef.month)
+          const yearIndex = efficiencies.value.findIndex((c) => c.year == currentDate.getFullYear())
+          if (yearIndex != -1) {
+            const dataIndex = efficiencies.value[yearIndex].data.findIndex(
+              (c) => c.month == currentDate.getMonth()
+            )
+            if (
+              dataIndex != -1 &&
+              ef.offTimes != null &&
+              ef.attitude != null &&
+              ef.percentKPIReached != null
+            ) {
+              efficiencies.value[yearIndex].data[dataIndex].quantity++
+              const quantity = efficiencies.value[yearIndex].data[dataIndex].quantity
+              efficiencies.value[yearIndex].data[dataIndex].offTimes =
+                (efficiencies.value[yearIndex].data[dataIndex].offTimes * (quantity - 1) +
+                  ef.offTimes) /
+                quantity
+              efficiencies.value[yearIndex].data[dataIndex].attitude =
+                (efficiencies.value[yearIndex].data[dataIndex].attitude * (quantity - 1) +
+                  ef.attitude) /
+                quantity
+              efficiencies.value[yearIndex].data[dataIndex].percentKPIReached =
+                (efficiencies.value[yearIndex].data[dataIndex].percentKPIReached * (quantity - 1) +
+                  ef.percentKPIReached) /
+                quantity
+            }
+          }
+        })
+      })
+    }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const setChart = () => {
@@ -371,7 +322,7 @@ const setChart = () => {
       >
         <p class="quantity__item">
           <span class="quantity__item__border" :style="`background-color: #ccc`"></span>
-          Tổng số lao động:
+          <span class="fs-3 fw-bolder">Tổng :</span>
           <span
             style="position: absolute; right: 5%; bottom: 5px"
             class="text-danger fw-bolder fs-3 ms-3"

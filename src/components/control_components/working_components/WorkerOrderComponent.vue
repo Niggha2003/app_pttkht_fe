@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { post, get } from '@/utils/httpRequest'
-import { useStore } from 'vuex'
 
 import modifyDate from '@/helpers/modifyDate'
 
@@ -13,7 +12,6 @@ import Tag from 'primevue/tag'
 
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
 
-const store = useStore()
 const emit = defineEmits(['saveWorker'])
 const props = defineProps(['worker'])
 const worker = ref(props.worker)
@@ -65,10 +63,6 @@ const handleUpdateInfo = async () => {
       }),
       ...(workerStateIndex.value == 3 && { timeGoBack: calendarGoBackDate.value })
     })
-    store.commit('changeDataNeeded', {
-      ...store.state.dataNeeded,
-      worker_list: updateResult.value.data
-    })
   } catch (e) {
     updateResult.value = e
   }
@@ -98,8 +92,11 @@ const getFlight = async () => {
 
 // thay đổi giá trị orderInfo
 const setOrderInfo = (order) => {
-  if (order == null) orderInfo.value = 'Lao động chưa chọn đơn hàng'
-  orderInfo.value = `Tên đơn hàng: ${order.orderName};\nTên công ty: ${order.companyName};\nMô tả: ${order.jobDescription};\nĐịa chỉ: ${order.companyAddress}`
+  if (order == null) {
+    orderInfo.value = 'Lao động chưa chọn đơn hàng'
+  } else {
+    orderInfo.value = `Tên đơn hàng: ${order.orderName};\nTên công ty: ${order.companyName};\nMô tả: ${order.jobDescription};\nĐịa chỉ: ${order.companyAddress}`
+  }
 }
 
 onMounted(async () => {

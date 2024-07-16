@@ -5,10 +5,8 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { get } from '@/utils/httpRequest'
 import { post } from '@/utils/httpRequest'
-import importImage from '@/helpers/importImage'
-import modifyDate from '@/helpers/modifyDate'
-import { useStore } from 'vuex'
 
+import ListComponent from '../content_components/ListComponent.vue'
 import WorkerInfoComponent from './WorkerInfoComponent.vue'
 import WorkerAddComponent from './WorkerAddComponent.vue'
 import WorkerEfficiencyComponent from './WorkerEfficiencyComponent.vue'
@@ -17,8 +15,6 @@ import WorkerOrderComponent from './WorkerOrderComponent.vue'
 import { FilterMatchMode, FilterOperator } from 'primevue/api'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-
-const store = useStore()
 
 const workerList = ref(null)
 const workerInfoShow = ref(null)
@@ -34,27 +30,20 @@ onMounted(() => {
   getWorkers()
 })
 
-const getWorkers = () => {
-  let workers = store.state.dataNeeded.worker_list
-  workers = workers.map((w) => {
-    w.accountTraining.person.birthDate = new Date(w.accountTraining.person.birthDate)
-    return w
-  })
-  workers = workers.filter((w) => w.isBanned == false).reverse()
-  workerList.value = workers
-  // try {
-  //   let workers = await get('/working/worker', {})
-  //   if (workers) {
-  //     workers = workers.map((w) => {
-  //       w.accountTraining.person.birthDate = new Date(w.accountTraining.person.birthDate)
-  //       return w
-  //     })
-  //     workers = workers.filter((w) => w.isBanned == false).reverse()
-  //     workerList.value = workers
-  //   }
-  // } catch (err) {
-  //   console.log(err)
-  // }
+const getWorkers = async () => {
+  try {
+    let workers = await get('/working/worker', {})
+    if (workers) {
+      workers = workers.map((w) => {
+        w.accountTraining.person.birthDate = new Date(w.accountTraining.person.birthDate)
+        return w
+      })
+      workers = workers.filter((w) => w.isBanned == false).reverse()
+      workerList.value = workers
+    }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 const initFilters = () => {
@@ -81,8 +70,8 @@ const clearFilter = () => {
   initFilters()
 }
 
-const handleSeeWorker = (id) => {
-  const worker = workerList.value.find((w) => w._id == id)
+const handleSeeWorker = (data) => {
+  const worker = workerList.value.find((w) => w._id == data._id)
   if (worker) {
     workerInfoShow.value = worker
     isWorkerShow.value = true
@@ -120,12 +109,12 @@ const handleSaveWorkerInfo = async (id, updateIndex) => {
   }
 }
 
-const handleAddWorkerToBlackList = async (workerId) => {
+const handleAddWorkerToBlackList = async (data) => {
   try {
-    const updateResult = await post(`/working/worker/${workerId}/update`, {
+    workerList.value = null
+    await post(`/working/worker/${data._id}/update`, {
       isBanned: true
     })
-    store.commit('changeDataNeeded', { ...store.state.dataNeeded, worker_list: updateResult.data })
     getWorkers()
   } catch (e) {
     console.log(e)
@@ -136,6 +125,54 @@ const handleAddWorkerToBlackList = async (workerId) => {
 const handleChangeModifyMode = (state) => {
   isDisabled.value = state
 }
+
+const columns = [
+  {
+    header: 'Ảnh',
+    width: '25%',
+    filterField: null,
+    type: 'image',
+    param: 'accountTraining.person.photo'
+  },
+  {
+    header: 'Tên lao động',
+    width: '25%',
+    filterField: 'accountTraining.person.name',
+    type: 'text',
+    param: 'accountTraining.person.name'
+  },
+  {
+    header: 'Ngày sinh',
+    width: '20%',
+    filterField: 'accountTraining.person.birthDate',
+    type: 'date',
+    param: 'accountTraining.person.birthDate'
+  },
+  {
+    header: 'Xem',
+    width: '12.5%',
+    filterField: null,
+    type: 'button',
+    severity: 'info',
+    label: 'Xem thông tin',
+    icon: 'pi pi-arrow-right',
+    buttonFunction: (data) => {
+      handleSeeWorker(data)
+    }
+  },
+  {
+    header: 'Xóa khỏi danh sách đen',
+    width: '17.5%',
+    filterField: null,
+    type: 'button',
+    label: 'Xóa khỏi danh sách đen',
+    severity: 'danger',
+    icon: 'pi pi-times',
+    buttonFunction: (data) => {
+      handleAddWorkerToBlackList(data)
+    }
+  }
+]
 </script>
 
 <template>
@@ -153,170 +190,17 @@ const handleChangeModifyMode = (state) => {
         <div>{{ workerList ? workerList.length : '' }}</div>
       </div>
     </div>
-    <DataTable
+    <ListComponent
+      v-if="workerList"
       v-model:filters="filters"
-      :value="workerList"
-      paginator
-      :rows="5"
-      dataKey="id"
-      filterDisplay="menu"
+      @clearFilter="clearFilter"
+      :items="workerList"
       :globalFilterFields="['accountTraining.person.name', 'accountTraining.person.birthDate']"
-      :pt="{
-        column: {
-          bodycell: {
-            class: { 'border-2': true },
-            style: { 'text-align': 'center', 'border-color': '#ccc' }
-          }
-        }
-      }"
+      :tableFor="'lao động'"
+      :columns="columns"
+      :type="'info'"
     >
-      <template #header>
-        <div class="flex justify-content-between mb-2">
-          <Button
-            type="button"
-            severity="info"
-            icon="pi pi-filter-slash"
-            label="Clear"
-            outlined
-            @click="clearFilter()"
-            :pt="{
-              root: { class: 'border-3' }
-            }"
-          />
-          <IconField iconPosition="left">
-            <InputIcon>
-              <i class="pi pi-search" />
-            </InputIcon>
-            <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
-          </IconField>
-        </div>
-      </template>
-      <template #empty> Không tìm thấy lao động. </template>
-      <Column
-        field="image"
-        header="Ảnh"
-        style="width: 25%"
-        :pt="{
-          headerCell: {
-            class: 'border-3',
-            style: 'border-color: #ccc; background-color: rgb(230, 234, 243);'
-          }
-        }"
-      >
-        <template #body="{ data }">
-          <img
-            :src="importImage('user', data.accountTraining.person.photo)"
-            :alt="data.accountTraining.person.name"
-            style="width: 100px; height: 100px"
-          />
-        </template>
-      </Column>
-      <Column
-        header="Tên lao động"
-        filterField="accountTraining.person.name"
-        style="width: 25%"
-        :pt="{
-          headerCell: {
-            class: 'border-3',
-            style: 'border-color: #ccc; background-color: rgb(230, 234, 243);'
-          }
-        }"
-      >
-        <template #body="{ data }">
-          {{ data.accountTraining.person.name }}
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            class="p-column-filter"
-            placeholder="Nhập tên để tìm kiếm"
-          />
-        </template>
-        <template #filterclear="{ filterCallback }">
-          <Button
-            type="button"
-            icon="pi pi-times"
-            @click="filterCallback()"
-            severity="secondary"
-          ></Button>
-        </template>
-        <template #filterapply="{ filterCallback }">
-          <Button
-            type="button"
-            icon="pi pi-check"
-            @click="filterCallback()"
-            severity="success"
-          ></Button>
-        </template>
-      </Column>
-      <Column
-        header="Ngày sinh"
-        filterField="accountTraining.person.birthDate"
-        dataType="date"
-        style="width: 20%"
-        :pt="{
-          headerCell: {
-            class: 'border-3',
-            style: 'border-color: #ccc; background-color: rgb(230, 234, 243);'
-          }
-        }"
-      >
-        <template #body="{ data }">
-          {{ modifyDate(data.accountTraining.person.birthDate.toISOString()) }}
-        </template>
-        <template #filter="{ filterModel }">
-          <Calendar
-            v-model="filterModel.value"
-            dateFormat="dd/mm/yy"
-            placeholder="dd/mm/yyyy"
-            mask="99/99/9999"
-          />
-        </template>
-      </Column>
-      <Column
-        header="Xem"
-        style="width: 12.5%"
-        :pt="{
-          headerCell: {
-            class: 'border-3',
-            style: 'border-color: #ccc; background-color: rgb(230, 234, 243);'
-          }
-        }"
-      >
-        <template #body="{ data }">
-          <Button
-            label="Xem thông tin"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            severity="danger"
-            @click="handleSeeWorker(data._id)"
-            style="border-radius: 50px; font-size: 10px"
-          />
-        </template>
-      </Column>
-      <Column
-        header="Thêm vào danh sách đen"
-        style="width: 17.5%"
-        :pt="{
-          headerCell: {
-            class: 'border-3',
-            style: 'border-color: #ccc; background-color: rgb(230, 234, 243);'
-          }
-        }"
-      >
-        <template #body="{ data }">
-          <Button
-            label="Thêm vào danh sách đen"
-            icon="pi pi-times"
-            iconPos="right"
-            severity="contrast"
-            @click="handleAddWorkerToBlackList(data._id)"
-            style="border-radius: 50px; font-size: 10px; background-color: #595959; border: none"
-          />
-        </template>
-      </Column>
-    </DataTable>
+    </ListComponent>
   </div>
   <div v-if="isWorkerAdd" class="card p-4">
     <div class="d-flex justify-content-start pe-5">

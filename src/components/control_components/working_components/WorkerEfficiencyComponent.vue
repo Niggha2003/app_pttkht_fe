@@ -1,7 +1,6 @@
 <script setup>
 import { onBeforeMount, ref } from 'vue'
 import { post } from '@/utils/httpRequest'
-import { useStore } from 'vuex'
 
 import Calendar from 'primevue/calendar'
 import Slider from 'primevue/slider'
@@ -10,7 +9,6 @@ import Chart from 'primevue/chart'
 
 import getMonthDifference from '@/helpers/getMonthDifference'
 
-const store = useStore()
 const emit = defineEmits(['saveWorker'])
 const props = defineProps(['worker'])
 const worker = ref(props.worker)
@@ -127,32 +125,32 @@ const setDateInfo = () => {
   if (worker.value.timeGoAbroad) {
     calendarDate.value = new Date(worker.value.timeGoAbroad)
     calendarMinDate.value = new Date(worker.value.timeGoAbroad)
-  }
-  let monthGap
-  if (worker.value.timeGoBack) {
-    monthGap = getMonthDifference(new Date(worker.value.timeGoBack), calendarMinDate.value)
-    let check = worker.value.efficiency.findIndex((eff) => eff.month > monthGap)
-    while (check != -1) {
-      worker.value.efficiency.splice(check, 1)
-      check = worker.value.efficiency.findIndex((eff) => eff.month > monthGap)
-    }
-  } else {
-    monthGap = getMonthDifference(new Date(), calendarMinDate.value)
-  }
-  for (let i = 0; i <= monthGap; i++) {
-    const check = worker.value.efficiency.findIndex((eff) => eff.month == i)
-    if (check == -1) {
-      currentEfficiency.value = {
-        month: i,
-        offTimes: null,
-        attitude: null,
-        percentKPIReached: null
+    let monthGap
+    if (worker.value.timeGoBack) {
+      monthGap = getMonthDifference(new Date(worker.value.timeGoBack), calendarMinDate.value)
+      let check = worker.value.efficiency.findIndex((eff) => eff.month > monthGap)
+      while (check != -1) {
+        worker.value.efficiency.splice(check, 1)
+        check = worker.value.efficiency.findIndex((eff) => eff.month > monthGap)
       }
-      worker.value.efficiency.push(currentEfficiency.value)
+    } else {
+      monthGap = getMonthDifference(new Date(), calendarMinDate.value)
     }
+    for (let i = 0; i <= monthGap; i++) {
+      const check = worker.value.efficiency.findIndex((eff) => eff.month == i)
+      if (check == -1) {
+        currentEfficiency.value = {
+          month: i,
+          offTimes: null,
+          attitude: null,
+          percentKPIReached: null
+        }
+        worker.value.efficiency.push(currentEfficiency.value)
+      }
+    }
+    currentEfficiencyIndex.value = worker.value.efficiency.findIndex((eff) => eff.month == 0)
+    currentEfficiency.value = worker.value.efficiency[currentEfficiencyIndex.value]
   }
-  currentEfficiencyIndex.value = worker.value.efficiency.findIndex((eff) => eff.month == 0)
-  currentEfficiency.value = worker.value.efficiency[currentEfficiencyIndex.value]
 }
 
 onBeforeMount(async () => {
@@ -169,10 +167,6 @@ const handleUpdateInfo = async () => {
   try {
     updateResult.value = await post(`/working/worker/${worker.value._id}/update`, {
       efficiency: worker.value.efficiency
-    })
-    store.commit('changeDataNeeded', {
-      ...store.state.dataNeeded,
-      worker_list: updateResult.value.data
     })
   } catch (e) {
     updateResult.value = e

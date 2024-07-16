@@ -79,8 +79,41 @@ const menu = [
     opened: false,
     type: 'employee',
     icon: faAddressBook,
-    to: { name: 'home_page' },
-    listChild: []
+    listChild: [
+      {
+        name: 'Danh sách tài khoản',
+        active: false,
+        icon: faList,
+        to: {
+          name: 'employee',
+          params: {
+            place: 'list'
+          }
+        }
+      },
+      {
+        name: 'Thống kê tài khoản',
+        active: false,
+        icon: faChartSimple,
+        to: {
+          name: 'employee',
+          params: {
+            place: 'stc'
+          }
+        }
+      },
+      {
+        name: 'Tạo tài khoản mới',
+        active: false,
+        icon: faBan,
+        to: {
+          name: 'employee',
+          params: {
+            place: 'add'
+          }
+        }
+      }
+    ]
   },
   {
     name: 'Xem trang web',

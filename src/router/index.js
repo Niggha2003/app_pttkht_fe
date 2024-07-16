@@ -2,10 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import { get } from '@/utils/httpRequest'
 
-import HomeView from '@/views/control_views/HomeView.vue'
-
+import controlPageRoute from './controlPageRoute'
 import homePageRoute from './homePageRoute'
-import workingRoute from './workingRoute'
 import store from '@/store'
 
 import menuList from '@/components/control_components/menuList'
@@ -13,17 +11,12 @@ import { MenuItemChildChange, MenuItemReset } from '@/components/control_compone
 
 const routes = [
   ...homePageRoute,
-  {
-    path: '/control',
-    name: 'home',
-    component: HomeView
-  },
+  ...controlPageRoute,
   {
     path: '/control/login',
     name: 'login',
     component: () => import('@/views/control_views/LoginView.vue')
-  },
-  workingRoute
+  }
 ]
 
 const router = createRouter({
@@ -43,7 +36,6 @@ router.beforeEach(async (to, from, next) => {
         if (check_result.user) {
           store.commit('login', true)
           store.commit('changeUser', JSON.stringify(check_result.user))
-          store.commit('changeDataNeeded', check_result.dataNeeded)
           if (to.name == 'login') {
             next({ name: 'home' })
           } else if (to.name == 'home') {
@@ -58,7 +50,6 @@ router.beforeEach(async (to, from, next) => {
         store.commit('login', false)
         if (sessionStorage.getItem('user')) {
           sessionStorage.removeItem('user')
-          sessionStorage.removeItem('dataNeeded')
         }
         if (to.name != 'login') {
           next({ name: 'login' })

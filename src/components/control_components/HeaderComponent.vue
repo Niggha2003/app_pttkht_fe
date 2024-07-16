@@ -72,7 +72,6 @@ const toggleNotice = (event) => {
 const handleSignOut = () => {
   store.commit('login', false)
   sessionStorage.removeItem('user')
-  sessionStorage.removeItem('dataNeeded')
   Cookies.set('jwt-token', '', { expires: 0 })
   router.push('/control/login')
 }

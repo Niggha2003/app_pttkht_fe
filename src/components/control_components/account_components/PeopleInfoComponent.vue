@@ -3,49 +3,50 @@
 import { ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 import { onMounted } from 'vue'
-import { useStore } from 'vuex'
 
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Dialog from 'primevue/dialog'
 
-const store = useStore()
-const addResult = ref(null)
-const addResultVisible = ref(false)
+import importImage from '@/helpers/importImage'
+import md5Hash from '@/helpers/md5Hash'
 
-const worker = ref({
-  isMarried: { text: 'Đã kết hôn', state: true },
-  accountTraining: {
-    accountCode: '',
-    password: '',
-    role: 'student',
-    person: {
-      name: '',
-      birthDate: new Date(),
-      phoneNumber: '',
-      academicLevel: { text: 'Đại học', code: 'dh' },
-      anotherCertificates: [],
-      address: '',
-      associateContact: {
-        name: '',
-        relation: '',
-        phoneNumber: ''
-      },
-      identifyCard: ''
-    }
-  }
-})
-const imageWorker = ref(null)
+const props = defineProps(['account'])
+const account = ref(props.account)
+const isDisabled = ref(true)
+
+const updateResult = ref(null)
+const initialAccountPassword = account.value.password
+
+const imageAccount = ref(null)
 let handleImageChange
 
-// Giá trị cho datatable edit row nhất định chỉ được chỉnh sửa
+const academyLevel = {
+  cs: 'Cơ sở',
+  pt: 'Phổ thông',
+  cd: 'Cao đẳng',
+  dh: 'Đại học'
+}
+
+// khởi tạo các giá trị hiển thị
+account.value.person.academicLevel = {
+  text: academyLevel[account.value.person.academicLevel],
+  code: account.value.person.academicLevel
+}
+
+account.value.person.birthDate = new Date(account.value.person.birthDate)
+account.value.password = ''
+const accountImg = importImage('user', account.value.person.photo)
+
+// Giá trị cho datatable edit row đang được chỉnh sửa
 const editingRowsAnotherCertificate = ref([])
+
+// Đây là những chỉ số row mà đang ở trạng thái edit
 const rowIndexEditAnotherCertificate = ref([])
 
-// xử lí edit row bảng chứng chỉ
+// xử lí edit row bảng chứng chỉ (khi save lại thì row đó không đang sửa nữa và sẽ lưu data lại nếu hợp lệ)
 const onRowEditSaveAnotherCertificate = (event) => {
   let { newData, index } = event
   const indexDelete = rowIndexEditAnotherCertificate.value.indexOf(index)
@@ -53,15 +54,19 @@ const onRowEditSaveAnotherCertificate = (event) => {
   if (newData.certificateName == '' || newData.level == '') {
     return
   } else {
-    worker.value.accountTraining.person.anotherCertificates[index] = newData
+    account.value.person.anotherCertificates[index] = newData
   }
 }
 
+// add chỉ số vào mảng các index đang chỉnh sửa
 const onRowEditInitAnotherCertificate = (event) => {
   let { index } = event
-  rowIndexEditAnotherCertificate.value.push(index)
+  if (isDisabled.value == false) {
+    rowIndexEditAnotherCertificate.value.push(index)
+  }
 }
 
+// hủy thì chỉ cần xóa index ra khỏi mảng các index đang chỉnh sửa
 const onRowEditCancelAnotherCertificate = (event) => {
   let { index } = event
 
@@ -69,98 +74,109 @@ const onRowEditCancelAnotherCertificate = (event) => {
   rowIndexEditAnotherCertificate.value.splice(indexDelete, 1)
 }
 
-const handleAddWorker = async () => {
+// gửi dữ liệu update
+const handleUpdateInfo = async () => {
   while (true) {
-    const indexDelete = worker.value.accountTraining.person.anotherCertificates.findIndex(
+    const indexDelete = account.value.person.anotherCertificates.findIndex(
       (c) => c.certificateName === '' && c.level === ''
     )
     if (indexDelete == -1) {
       break
     } else {
-      worker.value.accountTraining.person.anotherCertificates.splice(indexDelete, 1)
+      account.value.person.anotherCertificates.splice(indexDelete, 1)
     }
   }
   try {
-    addResult.value = await post(`/working/worker/create`, {
-      worker: {
-        ...worker.value,
-        isMarried: worker.value.isMarried.state,
-        accountTraining: {
-          ...worker.value.accountTraining,
-          person: {
-            ...worker.value.accountTraining.person,
-            birthDate: worker.value.accountTraining.person.birthDate.toISOString(),
-            academicLevel: worker.value.accountTraining.person.academicLevel.code
-          }
+    updateResult.value = await post(`/account/account_employee/${account.value._id}/update`, {
+      accountEmployee: {
+        ...account.value,
+        password:
+          account.value.password == '' ? initialAccountPassword : md5Hash(account.value.password),
+        person: {
+          ...account.value.person,
+          birthDate: account.value.person.birthDate.toISOString(),
+          academicLevel: account.value.person.academicLevel.code
         }
       }
     })
-    addResultVisible.value = true
-    store.commit('changeDataNeeded', {
-      ...store.state.dataNeeded,
-      worker_list: addResult.value.data
-    })
   } catch (e) {
-    addResult.value = e
-    addResultVisible.value = true
+    updateResult.value = e
   }
+  setTimeout(() => {
+    updateResult.value = null
+  }, 1000)
 }
 
 // thay đổi hình ảnh
 onMounted(() => {
   handleImageChange = (e) => {
     const fileInput = e.target
+
     if (fileInput.files && fileInput.files[0]) {
       const reader = new FileReader()
-      worker.value.accountTraining.person.photoType = fileInput.files[0].name.split('.')[1]
+      account.value.person.photoType = fileInput.files[0].name.split('.')[1]
 
       reader.onload = function (e) {
-        imageWorker.value.src = e.target.result
-        worker.value.accountTraining.person.photo = e.target.result
+        imageAccount.value.src = e.target.result
+        account.value.person.photo = e.target.result
       }
 
       reader.readAsDataURL(fileInput.files[0])
     }
   }
 })
+
+// các hàm xử lí bật tắt chế độ sửa
+const handleChangeModifyMode = (state) => {
+  isDisabled.value = state
+}
 </script>
 
 <template>
-  <div class="worker__info ms-5">
-    <Dialog
-      v-if="addResult"
-      v-model:visible="addResultVisible"
-      modal
-      header="Kết quả thêm mới tài khoản"
-      :style="{
-        width: '25rem',
-        'font-weight': 'bold',
-        'text-align': 'center'
-      }"
-    >
-      <div :style="{ color: addResult.status === 200 ? 'green' : 'red' }">
-        {{
-          addResult.status === 200
-            ? 'Thêm thành công'
-            : addResult.response.status === 409
-              ? 'Mã đăng nhập đã tồn tại'
-              : 'Cần nhập đầy đủ trường thông tin'
-        }}!!!
+  <div class="worker__info ms-2">
+    <div class="modify__choice d-flex flex-row-reverse">
+      <div
+        v-if="!isDisabled"
+        class="btn btn-secondary me-1"
+        style="width: 100px; height: 35px"
+        @click="handleChangeModifyMode(true)"
+      >
+        Tắt sửa
       </div>
-    </Dialog>
-    <div
-      v-if="!(addResult && addResult.status && addResult.status == 200)"
-      class="modify__choice d-flex flex-row-reverse"
-    >
-      <div class="btn btn-success me-1" style="width: 100px" @click="handleAddWorker">Thêm</div>
+      <div
+        v-if="isDisabled"
+        class="btn btn-danger me-1"
+        style="width: 100px; height: 35px"
+        @click="handleChangeModifyMode(false)"
+      >
+        Sửa
+      </div>
+      <div
+        v-if="!isDisabled"
+        class="btn btn-success me-1"
+        style="width: 100px"
+        @click="handleUpdateInfo"
+      >
+        Lưu
+      </div>
+      <div
+        v-if="updateResult && updateResult.status && !isDisabled"
+        style="color: green; font-weight: bold; margin-right: 20px"
+      >
+        {{ updateResult.status == 200 ? 'Lưu thành công' : 'Lưu không thành công' }}!!!
+      </div>
     </div>
-    <form v-if="!(addResult && addResult.status && addResult.status == 200)" class="pe-4">
+    <form class="pe-4">
       <fieldset class="row d-flex border-bottom justify-content-between my-2 pb-2">
         <legend class="p-0 fs-5 fw-bolder">Thông tin tài khoản</legend>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountCode">Tên người dùng tài khoản</label>
-            <InputText id="floatingAccountCode" v-model="worker.accountTraining.accountCode" />
+            <InputText
+              id="floatingAccountCode"
+              v-model="account.accountCode"
+              :disabled="isDisabled"
+            />
           </div>
         </div>
         <div class="col-5 p-0">
@@ -168,8 +184,9 @@ onMounted(() => {
             <label for="floatingAccountPassword">Mật khẩu</label>
             <Password
               id="floatingAccountPassword"
-              v-model="worker.accountTraining.password"
+              v-model="account.password"
               toggleMask
+              :disabled="isDisabled"
               :input-style="{ width: '100%' }"
             />
           </div>
@@ -178,11 +195,18 @@ onMounted(() => {
       <fieldset class="row d-flex border-bottom justify-content-between my-2 pb-2">
         <legend class="p-0 fs-5 mb-3 fw-bolder">Thông tin cá nhân</legend>
         <div class="col-5 p-0 border-0">
-          <input type="file" id="fileInput" class="d-none" @change="handleImageChange" />
+          <input
+            type="file"
+            id="fileInput"
+            class="d-none"
+            :disabled="isDisabled"
+            @change="handleImageChange"
+          />
           <label class="mb-4 d-flex justify-content-center" for="fileInput">
             <img
-              class="hoverOpacity"
-              ref="imageWorker"
+              :class="!isDisabled ? 'hoverOpacity' : ''"
+              ref="imageAccount"
+              :src="accountImg"
               alt="Click to upload"
               style="width: 300px"
             />
@@ -194,11 +218,12 @@ onMounted(() => {
             <InputText
               id="floatingAccountName"
               class="mb-3"
-              v-model="worker.accountTraining.person.name"
+              v-model="account.person.name"
+              :disabled="isDisabled"
             />
           </div>
         </div>
-        <div class="col-5 p-0">
+        <!-- <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountMarried">Tình trạng hôn nhân</label>
             <Dropdown
@@ -212,15 +237,17 @@ onMounted(() => {
               checkmark
               :highlightOnSelect="false"
               class="w-full md:w-14rem"
+              :disabled="isDisabled"
             />
           </div>
-        </div>
+        </div> -->
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountIdentifyCard">Căn cước công dân/Chứng minh thư</label>
             <InputText
-              v-model="worker.accountTraining.person.identifyCard"
+              v-model="account.person.identifyCard"
               id="floatingAccountIdentifyCard"
+              :disabled="isDisabled"
             />
           </div>
         </div>
@@ -229,7 +256,8 @@ onMounted(() => {
             <label for="floatingAccountBirthDate">Ngày sinh</label>
             <div class="flex-auto">
               <Calendar
-                v-model="worker.accountTraining.person.birthDate"
+                v-model="account.person.birthDate"
+                :disabled="isDisabled"
                 showIcon
                 :showOnFocus="false"
                 inputId="floatingAccountBirthDate"
@@ -247,8 +275,9 @@ onMounted(() => {
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountPhoneNumber">Số điện thoại</label>
             <InputText
-              v-model="worker.accountTraining.person.phoneNumber"
+              v-model="account.person.phoneNumber"
               id="floatingAccountPhoneNumber"
+              :disabled="isDisabled"
             />
           </div>
         </div>
@@ -256,8 +285,9 @@ onMounted(() => {
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountAddress">Địa chỉ</label>
             <InputText
-              v-model="worker.accountTraining.person.address"
+              v-model="account.person.address"
               id="floatingAccountAddress"
+              :disabled="isDisabled"
             />
           </div>
         </div>
@@ -265,7 +295,7 @@ onMounted(() => {
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountAcademicLevel">Trình độ bằng cấp</label>
             <Dropdown
-              v-model="worker.accountTraining.person.academicLevel"
+              v-model="account.person.academicLevel"
               :options="[
                 { text: 'Cơ sở', code: 'cs' },
                 { text: 'Phổ thông', code: 'pt' },
@@ -277,6 +307,7 @@ onMounted(() => {
               checkmark
               :highlightOnSelect="false"
               class="w-full md:w-14rem"
+              :disabled="isDisabled"
             />
           </div>
         </div>
@@ -288,8 +319,9 @@ onMounted(() => {
           <div class="d-flex flex-row gap-1 mb-2 align-items-center">
             <label style="width: 130px" for="floatingAssociationContactName">Tên: </label>
             <InputText
-              v-model="worker.accountTraining.person.associateContact.name"
+              v-model="account.person.associateContact.name"
               id="floatingAssociationContactName"
+              :disabled="isDisabled"
               :pt="{ root: { class: 'flex-grow-1' } }"
             />
           </div>
@@ -298,8 +330,9 @@ onMounted(() => {
               >Mối quan hệ:
             </label>
             <InputText
-              v-model="worker.accountTraining.person.associateContact.relation"
+              v-model="account.person.associateContact.relation"
               id="floatingAssociationContactRelation"
+              :disabled="isDisabled"
               :pt="{ root: { class: 'flex-grow-1' } }"
             />
           </div>
@@ -308,8 +341,9 @@ onMounted(() => {
               >Số điện thoại:
             </label>
             <InputText
-              v-model="worker.accountTraining.person.associateContact.phoneNumber"
+              v-model="account.person.associateContact.phoneNumber"
               id="floatingAssociationContactPhoneNumber"
+              :disabled="isDisabled"
               :pt="{ root: { class: 'flex-grow-1' } }"
             />
           </div>
@@ -319,7 +353,7 @@ onMounted(() => {
             <label class="mb-2" for="">Bằng cấp/ Chứng chỉ khác</label>
             <DataTable
               v-model:editingRows="editingRowsAnotherCertificate"
-              :value="worker.accountTraining.person.anotherCertificates"
+              :value="account.person.anotherCertificates"
               editMode="row"
               dataKey="id"
               @row-edit-save="onRowEditSaveAnotherCertificate"
@@ -330,7 +364,8 @@ onMounted(() => {
                 table: { style: 'width: 100%' },
                 column: {
                   bodycell: ({ state, instance }) => {
-                    state.d_editing = rowIndexEditAnotherCertificate.includes(instance.rowIndex)
+                    state.d_editing =
+                      rowIndexEditAnotherCertificate.includes(instance.rowIndex) && !isDisabled
                     return { class: { border: true } }
                   }
                 }
@@ -362,6 +397,7 @@ onMounted(() => {
                       aria-label="Cancel"
                       rounded
                       outlined
+                      :disabled="isDisabled"
                       :pt="{
                         root: {
                           class: 'rounded'
@@ -369,15 +405,11 @@ onMounted(() => {
                       }"
                       @click="
                         () => {
-                          const indexToRemove =
-                            worker.accountTraining.person.anotherCertificates.findIndex(
-                              (item) => item == data
-                            )
+                          const indexToRemove = account.person.anotherCertificates.findIndex(
+                            (item) => item == data
+                          )
                           if (indexToRemove !== -1) {
-                            worker.accountTraining.person.anotherCertificates.splice(
-                              indexToRemove,
-                              1
-                            )
+                            account.person.anotherCertificates.splice(indexToRemove, 1)
                           }
                         }
                       "
@@ -405,6 +437,7 @@ onMounted(() => {
             </DataTable>
             <Button
               label="Thêm"
+              :disabled="isDisabled"
               :pt="{
                 root: {
                   class: 'rounded mt-3',
@@ -413,13 +446,11 @@ onMounted(() => {
               }"
               @click="
                 () => {
-                  worker.accountTraining.person.anotherCertificates.push({
+                  account.person.anotherCertificates.push({
                     certificateName: '',
                     level: ''
                   })
-                  rowIndexEditAnotherCertificate.push(
-                    worker.accountTraining.person.anotherCertificates.length - 1
-                  )
+                  rowIndexEditAnotherCertificate.push(account.person.anotherCertificates.length - 1)
                 }
               "
             />
