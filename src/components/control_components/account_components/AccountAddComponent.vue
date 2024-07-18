@@ -12,6 +12,8 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
 
+import FormCoverComponent from '../content_components/FormCoverComponent.vue'
+
 const addResult = ref(null)
 const addResultVisible = ref(false)
 
@@ -231,7 +233,7 @@ onMounted(() => {
                 input-id="floatingAccountRole"
                 checkmark
                 :highlightOnSelect="false"
-                class="w-full md:w-14rem"
+                class="w-full"
               />
             </div>
           </div>
@@ -287,43 +289,44 @@ onMounted(() => {
                 input-id="floatingAccountAcademicLevel"
                 checkmark
                 :highlightOnSelect="false"
-                class="w-full md:w-14rem"
+                class="w-full"
               />
             </div>
           </div>
         </fieldset>
         <fieldset class="row d-flex border-bottom justify-content-between my-2 pb-2">
           <legend class="p-0 fs-5 mb-3 fw-bolder">Thông tin khác</legend>
-          <div class="col-5 p-0">
-            <label for="" class="mb-3">Người liên hệ</label>
-            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-              <label style="width: 130px" for="floatingAssociationContactName">Tên: </label>
-              <InputText
-                v-model="account.person.associateContact.name"
-                id="floatingAssociationContactName"
-                :pt="{ root: { class: 'flex-grow-1' } }"
-              />
-            </div>
-            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-              <label style="width: 130px" for="floatingAssociationContactRelation"
-                >Mối quan hệ:
-              </label>
-              <InputText
-                v-model="account.person.associateContact.relation"
-                id="floatingAssociationContactRelation"
-                :pt="{ root: { class: 'flex-grow-1' } }"
-              />
-            </div>
-            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-              <label style="width: 130px" for="floatingAssociationContactPhoneNumber"
-                >Số điện thoại:
-              </label>
-              <InputText
-                v-model="account.person.associateContact.phoneNumber"
-                id="floatingAssociationContactPhoneNumber"
-                :pt="{ root: { class: 'flex-grow-1' } }"
-              />
-            </div>
+          <div class="col-5 p-0 my-4">
+            <FormCoverComponent title="Người liên hệ">
+              <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+                <label style="width: 130px" for="floatingAssociationContactName">Tên: </label>
+                <InputText
+                  v-model="account.person.associateContact.name"
+                  id="floatingAssociationContactName"
+                  :pt="{ root: { class: 'flex-grow-1' } }"
+                />
+              </div>
+              <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+                <label style="width: 130px" for="floatingAssociationContactRelation"
+                  >Mối quan hệ:
+                </label>
+                <InputText
+                  v-model="account.person.associateContact.relation"
+                  id="floatingAssociationContactRelation"
+                  :pt="{ root: { class: 'flex-grow-1' } }"
+                />
+              </div>
+              <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+                <label style="width: 130px" for="floatingAssociationContactPhoneNumber"
+                  >Số điện thoại:
+                </label>
+                <InputText
+                  v-model="account.person.associateContact.phoneNumber"
+                  id="floatingAssociationContactPhoneNumber"
+                  :pt="{ root: { class: 'flex-grow-1' } }"
+                />
+              </div>
+            </FormCoverComponent>
           </div>
           <div class="col-5 p-0">
             <div class="d-flex flex-column gap-1">

@@ -12,7 +12,7 @@ import WorkerAddComponent from './WorkerAddComponent.vue'
 import WorkerEfficiencyComponent from './WorkerEfficiencyComponent.vue'
 import WorkerOrderComponent from './WorkerOrderComponent.vue'
 
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { FilterMatchMode } from 'primevue/api'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 
@@ -48,19 +48,7 @@ const getWorkers = async () => {
 
 const initFilters = () => {
   filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'accountTraining.person.photo': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
-    },
-    'accountTraining.person.name': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
-    },
-    'accountTraining.person.birthDate': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }]
-    }
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
   }
 }
 
@@ -130,29 +118,27 @@ const columns = [
   {
     header: 'Ảnh',
     width: '25%',
-    filterField: null,
     type: 'image',
+    urlFolder: 'user',
     param: 'accountTraining.person.photo'
   },
   {
     header: 'Tên lao động',
     width: '25%',
-    filterField: 'accountTraining.person.name',
     type: 'text',
     param: 'accountTraining.person.name'
   },
   {
     header: 'Ngày sinh',
     width: '20%',
-    filterField: 'accountTraining.person.birthDate',
     type: 'date',
     param: 'accountTraining.person.birthDate'
   },
   {
     header: 'Xem',
     width: '12.5%',
-    filterField: null,
     type: 'button',
+    iconPos: 'right',
     severity: 'info',
     label: 'Xem thông tin',
     icon: 'pi pi-arrow-right',
@@ -163,8 +149,8 @@ const columns = [
   {
     header: 'Thêm vào danh sách đen',
     width: '17.5%',
-    filterField: null,
     type: 'button',
+    iconPos: 'left',
     label: 'Thêm vào danh sách đen',
     severity: 'danger',
     icon: 'pi pi-times',

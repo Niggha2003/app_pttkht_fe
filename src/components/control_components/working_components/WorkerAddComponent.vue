@@ -245,7 +245,7 @@ onMounted(() => {
               input-id="floatingAccountMarried"
               checkmark
               :highlightOnSelect="false"
-              class="w-full md:w-14rem"
+              class="w-full"
             />
           </div>
         </div>
@@ -310,7 +310,7 @@ onMounted(() => {
               input-id="floatingAccountAcademicLevel"
               checkmark
               :highlightOnSelect="false"
-              class="w-full md:w-14rem"
+              class="w-full"
             />
           </div>
         </div>

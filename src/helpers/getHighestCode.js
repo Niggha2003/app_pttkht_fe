@@ -4,7 +4,6 @@ import { get } from '@/utils/httpRequest'
 // lấy ra mã hiện tại và trả về mã mới sau mã hiện tại
 export default async function (path, type) {
   const listResult = await get(path)
-  console.log(listResult)
   if (listResult.length > 0) {
     const latestValue = listResult[listResult.length - 1]
     if (type == 'working') {

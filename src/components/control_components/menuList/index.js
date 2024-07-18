@@ -6,7 +6,13 @@ import {
   faPager
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faList, faChartSimple, faBan, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import {
+  faList,
+  faChartSimple,
+  faBan,
+  faUserPlus,
+  faFolderPlus
+} from '@fortawesome/free-solid-svg-icons'
 
 const menu = [
   {
@@ -60,7 +66,41 @@ const menu = [
     type: 'ordering',
     icon: faFolder,
     to: { name: 'home_page' },
-    listChild: []
+    listChild: [
+      {
+        name: 'Danh sách đơn hàng',
+        active: false,
+        icon: faList,
+        to: {
+          name: 'ordering',
+          params: {
+            place: 'list'
+          }
+        }
+      },
+      {
+        name: 'Thống kê đơn hàng',
+        active: false,
+        icon: faChartSimple,
+        to: {
+          name: 'ordering',
+          params: {
+            place: 'stc'
+          }
+        }
+      },
+      {
+        name: 'Tạo đơn hàng mới',
+        active: false,
+        icon: faFolderPlus,
+        to: {
+          name: 'ordering',
+          params: {
+            place: 'add'
+          }
+        }
+      }
+    ]
   },
   {
     name: 'Quản lí đơn đăng kí',

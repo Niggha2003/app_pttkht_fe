@@ -5,7 +5,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { get } from '@/utils/httpRequest'
 
-import { FilterMatchMode, FilterOperator } from 'primevue/api'
+import { FilterMatchMode } from 'primevue/api'
 
 import PeopleInfoComponent from './PeopleInfoComponent.vue'
 import ListComponent from '../content_components/ListComponent.vue'
@@ -20,11 +20,14 @@ const accountInfoShow = ref(null)
 
 const isAccountShow = ref(false)
 
-const filters = ref()
+const filtersWorking = ref()
+const filtersOrdering = ref()
+const filtersSigning = ref()
+const filtersAdmin = ref()
 
 const getAccounts = async () => {
   let accounts = await get('/account/account_employee')
-  accounts = accounts.map((a) => {
+  accounts = accounts.reverse().map((a) => {
     a.person.birthDate = new Date(a.person.birthDate)
     return a
   })
@@ -35,29 +38,30 @@ const getAccounts = async () => {
   accountAdminControls.value = accounts.filter((a) => a.role == 'admin')
 }
 
+const clearFiltersWorking = () => {
+  filtersWorking.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+}
+
+const clearFiltersOrdering = () => {
+  filtersOrdering.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+}
+
+const clearFiltersSigning = () => {
+  filtersSigning.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+}
+
+const clearFiltersAdmin = () => {
+  filtersAdmin.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+}
+
 const initFilters = () => {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'person.photo': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
-    },
-    'person.name': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }]
-    },
-    'person.birthDate': {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }]
-    }
-  }
+  filtersWorking.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+  filtersOrdering.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+  filtersSigning.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
+  filtersAdmin.value = { global: { value: null, matchMode: FilterMatchMode.CONTAINS } }
 }
 
 initFilters()
-
-const clearFilter = () => {
-  initFilters()
-}
 
 const handleSeeAccount = (data) => {
   const account = accountList.value.find((a) => a._id == data._id)
@@ -68,26 +72,30 @@ const handleSeeAccount = (data) => {
 }
 
 const columns = [
-  { header: 'Ảnh', width: '25%', filterField: null, type: 'image', param: 'person.photo' },
+  {
+    header: 'Ảnh',
+    width: '25%',
+    type: 'image',
+    urlFolder: 'user',
+    param: 'person.photo'
+  },
   {
     header: 'Tên lao động',
     width: '25%',
-    filterField: 'person.name',
     type: 'text',
     param: 'person.name'
   },
   {
     header: 'Ngày sinh',
     width: '20%',
-    filterField: 'person.birthDate',
     type: 'date',
     param: 'person.birthDate'
   },
   {
     header: 'Xem',
     width: '12.5%',
-    filterField: null,
     type: 'button',
+    iconPos: 'right',
     severity: 'danger',
     label: 'Xem thông tin tài khoản',
     icon: 'pi pi-arrow-right',
@@ -116,8 +124,8 @@ Promise.all([getAccounts()])
     </div>
     <ListComponent
       v-if="accountList && accountWorkingControls"
-      v-model:filters="filters"
-      @clearFilter="clearFilter"
+      v-model:filters="filtersWorking"
+      @clearFilter="clearFiltersWorking"
       :items="accountWorkingControls"
       :globalFilterFields="['person.name', 'person.birthDate']"
       :tableFor="'nhân viên'"
@@ -141,8 +149,8 @@ Promise.all([getAccounts()])
     </div>
     <ListComponent
       v-if="accountList && accountOrderingControls"
-      v-model:filters="filters"
-      @clearFilter="clearFilter"
+      v-model:filters="filtersOrdering"
+      @clearFilter="clearFiltersOrdering"
       :items="accountOrderingControls"
       :globalFilterFields="['person.name', 'person.birthDate']"
       :tableFor="'nhân viên'"
@@ -166,8 +174,8 @@ Promise.all([getAccounts()])
     </div>
     <ListComponent
       v-if="accountList && accountSigningControls"
-      v-model:filters="filters"
-      @clearFilter="clearFilter"
+      v-model:filters="filtersSigning"
+      @clearFilter="clearFiltersSigning"
       :items="accountSigningControls"
       :globalFilterFields="['person.name', 'person.birthDate']"
       :tableFor="'nhân viên'"
@@ -191,8 +199,8 @@ Promise.all([getAccounts()])
     </div>
     <ListComponent
       v-if="accountList && accountAdminControls"
-      v-model:filters="filters"
-      @clearFilter="clearFilter"
+      v-model:filters="filtersAdmin"
+      @clearFilter="clearFiltersAdmin"
       :items="accountAdminControls"
       :globalFilterFields="['person.name', 'person.birthDate']"
       :tableFor="'nhân viên'"

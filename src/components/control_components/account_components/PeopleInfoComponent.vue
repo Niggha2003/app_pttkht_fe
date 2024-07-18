@@ -13,6 +13,8 @@ import Column from 'primevue/column'
 import importImage from '@/helpers/importImage'
 import md5Hash from '@/helpers/md5Hash'
 
+import FormCoverComponent from '../content_components/FormCoverComponent.vue'
+
 const props = defineProps(['account'])
 const account = ref(props.account)
 const isDisabled = ref(true)
@@ -171,15 +173,15 @@ const handleChangeModifyMode = (state) => {
         <legend class="p-0 fs-5 fw-bolder">Thông tin tài khoản</legend>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountCode">Tên người dùng tài khoản</label>
-            <InputText id="floatingAccountCode" v-model="account.accountCode" :disabled="true" />
+            <label for="AccountCode">Tên người dùng tài khoản</label>
+            <InputText id="AccountCode" v-model="account.accountCode" :disabled="true" />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountPassword">Mật khẩu</label>
+            <label for="AccountPassword">Mật khẩu</label>
             <Password
-              id="floatingAccountPassword"
+              id="AccountPassword"
               v-model="account.password"
               toggleMask
               :disabled="isDisabled"
@@ -210,53 +212,35 @@ const handleChangeModifyMode = (state) => {
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountName">Tên nhân viên</label>
+            <label for="AccountName">Tên nhân viên</label>
             <InputText
-              id="floatingAccountName"
+              id="AccountName"
               class="mb-3"
               v-model="account.person.name"
               :disabled="isDisabled"
             />
           </div>
         </div>
-        <!-- <div class="col-5 p-0">
-          <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountMarried">Tình trạng hôn nhân</label>
-            <Dropdown
-              v-model="worker.isMarried"
-              :options="[
-                { text: 'Đã kết hôn', state: true },
-                { text: 'Chưa kết hôn', state: false }
-              ]"
-              optionLabel="text"
-              input-id="floatingAccountMarried"
-              checkmark
-              :highlightOnSelect="false"
-              class="w-full md:w-14rem"
-              :disabled="isDisabled"
-            />
-          </div>
-        </div> -->
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountIdentifyCard">Căn cước công dân/Chứng minh thư</label>
+            <label for="AccountIdentifyCard">Căn cước công dân/Chứng minh thư</label>
             <InputText
               v-model="account.person.identifyCard"
-              id="floatingAccountIdentifyCard"
+              id="AccountIdentifyCard"
               :disabled="isDisabled"
             />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountBirthDate">Ngày sinh</label>
+            <label for="AccountBirthDate">Ngày sinh</label>
             <div class="flex-auto">
               <Calendar
                 v-model="account.person.birthDate"
                 :disabled="isDisabled"
                 showIcon
                 :showOnFocus="false"
-                inputId="floatingAccountBirthDate"
+                inputId="AccountBirthDate"
                 dateFormat="dd/mm/yy"
                 :pt="{
                   root: {
@@ -269,27 +253,27 @@ const handleChangeModifyMode = (state) => {
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountPhoneNumber">Số điện thoại</label>
+            <label for="AccountPhoneNumber">Số điện thoại</label>
             <InputText
               v-model="account.person.phoneNumber"
-              id="floatingAccountPhoneNumber"
+              id="AccountPhoneNumber"
               :disabled="isDisabled"
             />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountAddress">Địa chỉ</label>
+            <label for="AccountAddress">Địa chỉ</label>
             <InputText
               v-model="account.person.address"
-              id="floatingAccountAddress"
+              id="AccountAddress"
               :disabled="isDisabled"
             />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
-            <label for="floatingAccountAcademicLevel">Trình độ bằng cấp</label>
+            <label for="AccountAcademicLevel">Trình độ bằng cấp</label>
             <Dropdown
               v-model="account.person.academicLevel"
               :options="[
@@ -299,10 +283,10 @@ const handleChangeModifyMode = (state) => {
                 { text: 'Đại học', code: 'dh' }
               ]"
               optionLabel="text"
-              input-id="floatingAccountAcademicLevel"
+              input-id="AccountAcademicLevel"
               checkmark
               :highlightOnSelect="false"
-              class="w-full md:w-14rem"
+              class="w-full"
               :disabled="isDisabled"
             />
           </div>
@@ -310,39 +294,38 @@ const handleChangeModifyMode = (state) => {
       </fieldset>
       <fieldset class="row d-flex border-bottom justify-content-between my-2 pb-2">
         <legend class="p-0 fs-5 mb-3 fw-bolder">Thông tin khác</legend>
-        <div class="col-5 p-0">
-          <label for="" class="mb-3">Người liên hệ</label>
-          <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-            <label style="width: 130px" for="floatingAssociationContactName">Tên: </label>
-            <InputText
-              v-model="account.person.associateContact.name"
-              id="floatingAssociationContactName"
-              :disabled="isDisabled"
-              :pt="{ root: { class: 'flex-grow-1' } }"
-            />
-          </div>
-          <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-            <label style="width: 130px" for="floatingAssociationContactRelation"
-              >Mối quan hệ:
-            </label>
-            <InputText
-              v-model="account.person.associateContact.relation"
-              id="floatingAssociationContactRelation"
-              :disabled="isDisabled"
-              :pt="{ root: { class: 'flex-grow-1' } }"
-            />
-          </div>
-          <div class="d-flex flex-row gap-1 mb-2 align-items-center">
-            <label style="width: 130px" for="floatingAssociationContactPhoneNumber"
-              >Số điện thoại:
-            </label>
-            <InputText
-              v-model="account.person.associateContact.phoneNumber"
-              id="floatingAssociationContactPhoneNumber"
-              :disabled="isDisabled"
-              :pt="{ root: { class: 'flex-grow-1' } }"
-            />
-          </div>
+        <div class="col-5 p-0 my-4">
+          <FormCoverComponent title="Người liên hệ">
+            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+              <label style="width: 130px" for="AssociationContactName">Tên: </label>
+              <InputText
+                v-model="account.person.associateContact.name"
+                id="AssociationContactName"
+                :disabled="isDisabled"
+                :pt="{ root: { class: 'flex-grow-1' } }"
+              />
+            </div>
+            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+              <label style="width: 130px" for="AssociationContactRelation">Mối quan hệ: </label>
+              <InputText
+                v-model="account.person.associateContact.relation"
+                id="AssociationContactRelation"
+                :disabled="isDisabled"
+                :pt="{ root: { class: 'flex-grow-1' } }"
+              />
+            </div>
+            <div class="d-flex flex-row gap-1 mb-2 align-items-center">
+              <label style="width: 130px" for="AssociationContactPhoneNumber"
+                >Số điện thoại:
+              </label>
+              <InputText
+                v-model="account.person.associateContact.phoneNumber"
+                id="AssociationContactPhoneNumber"
+                :disabled="isDisabled"
+                :pt="{ root: { class: 'flex-grow-1' } }"
+              />
+            </div>
+          </FormCoverComponent>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1">

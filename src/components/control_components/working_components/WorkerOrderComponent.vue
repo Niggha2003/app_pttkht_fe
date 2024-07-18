@@ -76,6 +76,7 @@ const handleUpdateInfo = async () => {
 const getOrders = async () => {
   try {
     orders.value = await get('order/order/', {})
+    orders.value = orders.value.reverse()
   } catch (e) {
     console.log(e)
   }
@@ -85,6 +86,7 @@ const getOrders = async () => {
 const getFlight = async () => {
   try {
     flight.value = await get('order/flight/', { workerId: worker.value._id })
+    flight.value = flight.value.reverse()
   } catch (e) {
     console.log(e)
   }
@@ -236,7 +238,7 @@ onMounted(async () => {
               filter
               optionLabel="orderCode"
               placeholder="Chọn mã đơn hàng"
-              class="w-full md:w-14rem"
+              class="w-full"
               :disabled="isDisabled"
               @change="setOrderInfo(worker.order)"
             >

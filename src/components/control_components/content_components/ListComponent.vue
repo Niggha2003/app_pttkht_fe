@@ -14,10 +14,13 @@ const globalFilterFields = props.globalFilterFields
 const tableFor = props.tableFor
 
 // 1 column  có thể có các thuộc tính:
-// header: "", width: "", filterField : null, type: "", param: "",icon, severity buttonFunction: function() {}
+// header: "", width: "", type: "", param: "",icon, severity buttonFunction: function() {}
 // Trong đó:
-// - type có thể bằng text, date, image, button, nếu có button sẽ có thêm buttonFunction, icon, severity, label
 // - param là chỉ mục tham chiếu của object ví dụ (person.name)
+// - type có thể bằng text, date, image, button, tag
+// - nếu có button sẽ có thêm buttonFunction, icon, severity, label, iconPos
+// - nếu có tag sẽ có thêm icon, severity, iconPos
+// - type bằng image thì có thêm urlFolder là đường dẫn của folder chứa hình ảnh đó trong server
 const columns = props.columns
 
 // type có thể là info, hoặc là black
@@ -77,7 +80,6 @@ const type = props.type
       :key="column"
       :header="column.header"
       :style="`width: ${column.width}`"
-      :filterField="column.filterField ? column.filterField : null"
       :dataType="column.type == 'date' ? 'date' : null"
       :pt="{
         headerCell: {
@@ -92,7 +94,7 @@ const type = props.type
       <template #body="{ data }">
         <img
           v-if="column.type == 'image'"
-          :src="importImage('user', getValueByMultipleKey(data, column.param))"
+          :src="importImage(column.urlFolder, getValueByMultipleKey(data, column.param))"
           style="width: 100px; height: 100px"
         />
 
@@ -106,50 +108,19 @@ const type = props.type
           v-if="column.type == 'button'"
           :label="column.label"
           :icon="column.icon"
-          iconPos="right"
+          :iconPos="column.iconPos"
           :severity="column.severity"
           @click="column.buttonFunction(data)"
           style="border-radius: 50px; font-size: 10px"
         />
-      </template>
-      <template v-if="column.filterField" #filter="{ filterModel }">
-        <InputText
-          v-if="column.type == 'text'"
-          v-model="filterModel.value"
-          type="text"
-          class="p-column-filter"
-          placeholder="Nhập tên để tìm kiếm"
-        />
 
-        <Calendar
-          v-if="column.type == 'date'"
-          v-model="filterModel.value"
-          dateFormat="dd/mm/yy"
-          placeholder="dd/mm/yyyy"
-          mask="99/99/9999"
-        />
-      </template>
-      <template
-        v-if="column.type == 'text' && column.filterField"
-        #filterclear="{ filterCallback }"
-      >
-        <Button
-          type="button"
-          icon="pi pi-times"
-          @click="filterCallback()"
-          severity="secondary"
-        ></Button>
-      </template>
-      <template
-        v-if="column.type == 'text' && column.filterField"
-        #filterapply="{ filterCallback }"
-      >
-        <Button
-          type="button"
-          icon="pi pi-check"
-          @click="filterCallback()"
-          severity="success"
-        ></Button>
+        <Tag
+          v-if="column.type == 'tag'"
+          :value="getValueByMultipleKey(data, column.param)"
+          :icon="column.icon"
+          :severity="getValueByMultipleKey(data, column.severity)"
+          :iconPos="column.iconPos"
+        ></Tag>
       </template>
     </Column>
   </DataTable>
