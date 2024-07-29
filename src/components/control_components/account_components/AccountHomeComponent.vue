@@ -109,106 +109,180 @@ Promise.all([getAccounts()])
 </script>
 
 <template>
-  <div v-if="!isAccountShow" class="account__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
+  <TabView
+    v-if="!isAccountShow"
+    :pt="{
+      inkbar: { style: 'background-color: #dc3545; height: 3px ' },
+      navcontent: { class: 'mt-2' }
+    }"
+    class="card mb-6"
+  >
+    <TabPanel
+      header="QL Lao Động"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-      Nhân viên quản lí lao động
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng nhân viên quản lí lao động hiện tại:</div>
-        <div>{{ accountWorkingControls ? accountWorkingControls.length : '' }}</div>
+      <div class="account__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Nhân viên quản lí lao động
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng nhân viên quản lí lao động hiện tại:</div>
+            <div>{{ accountWorkingControls ? accountWorkingControls.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="accountList && accountWorkingControls"
+          v-model:filters="filtersWorking"
+          @clearFilter="clearFiltersWorking"
+          :items="accountWorkingControls"
+          :globalFilterFields="['person.name', 'person.birthDate']"
+          :tableFor="'nhân viên'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="accountList && accountWorkingControls"
-      v-model:filters="filtersWorking"
-      @clearFilter="clearFiltersWorking"
-      :items="accountWorkingControls"
-      :globalFilterFields="['person.name', 'person.birthDate']"
-      :tableFor="'nhân viên'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="QL Đơn Hàng"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isAccountShow" class="account__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Nhân viên quản lí đơn hàng
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng nhân viên quản lí đơn hàng hiện tại:</div>
-        <div>{{ accountOrderingControls ? accountOrderingControls.length : '' }}</div>
+      <div class="account__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Nhân viên quản lí đơn hàng
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng nhân viên quản lí đơn hàng hiện tại:</div>
+            <div>{{ accountOrderingControls ? accountOrderingControls.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="accountList && accountOrderingControls"
+          v-model:filters="filtersOrdering"
+          @clearFilter="clearFiltersOrdering"
+          :items="accountOrderingControls"
+          :globalFilterFields="['person.name', 'person.birthDate']"
+          :tableFor="'nhân viên'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="accountList && accountOrderingControls"
-      v-model:filters="filtersOrdering"
-      @clearFilter="clearFiltersOrdering"
-      :items="accountOrderingControls"
-      :globalFilterFields="['person.name', 'person.birthDate']"
-      :tableFor="'nhân viên'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="QL Đơn Đăng kí"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isAccountShow" class="account__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Nhân viên quản lí đơn đăng kí
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng nhân viên quản lí đơn đăng kí hiện tại:</div>
-        <div>{{ accountSigningControls ? accountSigningControls.length : '' }}</div>
+      <div class="account__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Nhân viên quản lí đơn đăng kí
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng nhân viên quản lí đơn đăng kí hiện tại:</div>
+            <div>{{ accountSigningControls ? accountSigningControls.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="accountList && accountSigningControls"
+          v-model:filters="filtersSigning"
+          @clearFilter="clearFiltersSigning"
+          :items="accountSigningControls"
+          :globalFilterFields="['person.name', 'person.birthDate']"
+          :tableFor="'nhân viên'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="accountList && accountSigningControls"
-      v-model:filters="filtersSigning"
-      @clearFilter="clearFiltersSigning"
-      :items="accountSigningControls"
-      :globalFilterFields="['person.name', 'person.birthDate']"
-      :tableFor="'nhân viên'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="Admin"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isAccountShow" class="account__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Nhân viên admin
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng nhân viên admin hiện tại:</div>
-        <div>{{ accountAdminControls ? accountAdminControls.length : '' }}</div>
+      <div class="account__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Nhân viên admin
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng nhân viên admin hiện tại:</div>
+            <div>{{ accountAdminControls ? accountAdminControls.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="accountList && accountAdminControls"
+          v-model:filters="filtersAdmin"
+          @clearFilter="clearFiltersAdmin"
+          :items="accountAdminControls"
+          :globalFilterFields="['person.name', 'person.birthDate']"
+          :tableFor="'nhân viên'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="accountList && accountAdminControls"
-      v-model:filters="filtersAdmin"
-      @clearFilter="clearFiltersAdmin"
-      :items="accountAdminControls"
-      :globalFilterFields="['person.name', 'person.birthDate']"
-      :tableFor="'nhân viên'"
-      :columns="columns"
-      :type="'info'"
-    >
-    </ListComponent>
-  </div>
+    </TabPanel>
+  </TabView>
+
   <div v-if="isAccountShow" class="card pt-3">
     <div class="d-flex justify-content-between my-2 pe-5">
       <div

@@ -57,10 +57,20 @@ const handleSendInfo = async () => {
   ) {
     result.value = { status: 400 }
   } else {
-    const order = await get('/order/order', { orderCode: information.value.orderCode })
-    console.log(order[0])
-    information.value.order = order[0]._id
-    result.value = await post('/signing/apply/create', { apply: information.value })
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(information.value.email) ||
+      !/^[\d\s]+$/.test(information.value.phoneNumber)
+    ) {
+      result.value = { status: 403 }
+    } else {
+      const order = await get('/order/order', { orderCode: information.value.orderCode })
+      if (order.length == 0) {
+        result.value = { status: 404 }
+      } else {
+        information.value.order = order[0]._id
+        result.value = await post('/signing/apply/create', { apply: information.value })
+      }
+    }
   }
   isResultDialogShow.value = true
 }
@@ -188,13 +198,14 @@ Promise.all([getInfoCompany()])
       <div
         :class="`fw-bolder ${result && result.status && result.status == 200 ? 'text-success' : 'text-danger'} `"
       >
-        {{
-          result && result.status && result.status == 200
-            ? 'Ứng tuyển thành công vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!! Trân trọng!!'
-            : result && result.status && result.status == 400
-              ? 'Mời nhập đầy đủ trường thông tin!!!'
-              : 'Mã đơn hàng không hợp lệ!!!'
-        }}
+        {{ result && result.status && result.status == 200 ? `
+        <div>
+          Ứng tuyển thành công vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!!
+        </div>
+        <div>Trân trọng!!</div>
+        ` : result && result.status && result.status == 400 ? 'Mời nhập đầy đủ trường thông tin!!!'
+        : result && result.status && result.status == 404 ? 'Mã đơn hàng không hợp lệ!!!' : `Email
+        không hợp lệ hoặc số điện thoại không hợp lệ` }}
       </div>
     </div>
   </Dialog>

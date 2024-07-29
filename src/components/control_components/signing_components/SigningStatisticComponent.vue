@@ -8,68 +8,61 @@ import StatisticChartComponent from '../chart_components/StatisticChartComponent
 onMounted(async () => {
   getItemQuantity()
 
-  await getOrderDataLine()
+  await getSigningDataLine()
   await setChart()
 })
 
-const itemInprogressQuantities = ref(null)
-const itemCompletedQuantities = ref(null)
 const itemAllQuantities = ref(null)
 
 const colors = [
   'rgba(255, 99, 132, 1)', // Red
   'rgba(54, 162, 235, 1)', // Blue
+  'rgba(153, 102, 255, 1)', //purple
   'rgba(75, 192, 192, 1)', // Green
+  'rgba(255, 159, 64, 1)', // orange
   'rgba(0, 0, 0, 1)'
 ]
 const colorsHover = [
   'rgba(255, 99, 132, 0.4)', // Red
   'rgba(54, 162, 235, 0.4)', // Blue
+  'rgba(153, 102, 255, 0.4)', //purple
   'rgba(75, 192, 192, 0.4)', // Green
+  'rgba(255, 159, 64, 0.4)', // orange
   'rgba(0, 0, 0, 0.4)'
 ]
-const items = ['Cơ Khí', 'Dệt May', 'Giúp việc', 'Làm Nông']
+const items = [
+  'Chưa liên hệ',
+  'Đã liên hệ đang chờ gửi hồ sơ',
+  'Đã nộp hồ sơ đang chờ kiểm tra',
+  'Hồ sơ hợp lệ',
+  'Hồ sơ không hợp lệ',
+  'Cấm'
+]
 
 const getItemQuantity = async () => {
   try {
-    itemInprogressQuantities.value = [0, 0, 0, 0]
-    itemCompletedQuantities.value = [0, 0, 0, 0]
-    itemAllQuantities.value = [0, 0, 0, 0]
+    itemAllQuantities.value = [0, 0, 0, 0, 0, 0]
 
-    let orders = await get('/order/order')
-    if (orders) {
-      orders.forEach((o) => {
-        if (o.type == 'ck') {
+    let signings = await get('/signing/apply')
+    if (signings) {
+      signings.forEach((s) => {
+        if (s.state == 'hct') {
           itemAllQuantities.value[0]++
-          if (o.state == 'completed') {
-            itemCompletedQuantities.value[0]++
-          } else {
-            itemInprogressQuantities.value[0]++
-          }
         }
-        if (o.type == 'dm') {
+        if (s.state == 'ipg') {
           itemAllQuantities.value[1]++
-          if (o.state == 'completed') {
-            itemCompletedQuantities.value[1]++
-          } else {
-            itemInprogressQuantities.value[1]++
-          }
         }
-        if (o.type == 'os') {
+        if (s.state == 'sent') {
           itemAllQuantities.value[2]++
-          if (o.state == 'completed') {
-            itemCompletedQuantities.value[2]++
-          } else {
-            itemInprogressQuantities.value[2]++
-          }
         }
-        if (o.type == 'bv') {
+        if (s.state == 'passed') {
           itemAllQuantities.value[3]++
-          if (o.state == 'completed') {
-            itemCompletedQuantities.value[3]++
-          } else {
-            itemInprogressQuantities.value[3]++
-          }
+        }
+        if (s.state == 'failed') {
+          itemAllQuantities.value[4]++
+        }
+        if (s.state == 'halt') {
+          itemAllQuantities.value[5]++
         }
       })
     }
@@ -82,7 +75,7 @@ const chartDataLine = ref()
 const chartOptionsLine = ref()
 
 const first = ref(0)
-const orderData = ref([])
+const signingData = ref([])
 const defaultYear = import.meta.env.VITE_VUE_APP_YEAR_FOUNDED
 const totalRecords = ref(new Date().getFullYear() - defaultYear + 1)
 
@@ -104,20 +97,36 @@ const setChartDataLine = () => {
     ],
     datasets: [
       {
-        label: 'Số lượng đơn hàng được tạo',
-        data: orderData.value[first.value].data.map((d) => d.created),
+        label: 'Số lượng đơn đăng kí được gửi đến',
+        data: signingData.value[first.value].data.map((d) => d.created),
         fill: false,
         tension: 0.4,
-        borderColor: 'red',
-        yAxisID: 'y1' // Chỉ định trục y1 cho dataset này
+        borderColor: 'orange',
+        yAxisID: 'y' // Chỉ định trục y1 cho dataset này
       },
       {
-        label: 'Số lượng đơn hàng hoàn thành',
-        data: orderData.value[first.value].data.map((d) => d.completed),
+        label: 'Số lượng đơn đăng kí hợp lệ',
+        data: signingData.value[first.value].data.map((d) => d.completed),
         fill: true,
-        borderColor: 'gray',
+        borderColor: 'success',
         tension: 0.4,
-        backgroundColor: '#b9b9b929',
+        yAxisID: 'y' // Chỉ định trục y cho dataset này
+      },
+      {
+        label: 'Số lượng đơn đăng kí không hợp lệ',
+        data: signingData.value[first.value].data.map((d) => d.created),
+        fill: false,
+        tension: 0.4,
+        borderColor: 'gray',
+        yAxisID: 'y' // Chỉ định trục y1 cho dataset này
+      },
+      {
+        label: 'Số lượng đơn đăng kí bị cấm',
+        data: signingData.value[first.value].data.map((d) => d.completed),
+        fill: true,
+        borderColor: 'black',
+        tension: 0.4,
+        backgroundColor: '#ccc',
         yAxisID: 'y' // Chỉ định trục y cho dataset này
       }
     ]
@@ -159,30 +168,17 @@ const setChartOptionsLine = () => {
           display: true,
           drawBorder: true
         }
-      },
-      y1: {
-        type: 'linear',
-        display: true,
-        position: 'right',
-        ticks: {
-          color: textColorSecondary
-        },
-        grid: {
-          drawOnChartArea: false,
-          display: true,
-          drawBorder: true
-        }
       }
     }
   }
 }
 
-const getOrderDataLine = async () => {
+const getSigningDataLine = async () => {
   // khởi tạo biến lưu trữ thông tin dữ liệu
   const thisDate = new Date()
   for (let i = defaultYear; i <= thisDate.getFullYear(); i++) {
     if (i == thisDate.getFullYear()) {
-      orderData.value.unshift({
+      signingData.value.unshift({
         year: i,
         data: (() => {
           const d = []
@@ -190,14 +186,16 @@ const getOrderDataLine = async () => {
             d.push({
               month: j,
               created: 0,
-              completed: 0
+              passed: 0,
+              failed: 0,
+              halt: 0
             })
           }
           return d
         })()
       })
     } else {
-      orderData.value.unshift({
+      signingData.value.unshift({
         year: i,
         data: (() => {
           const d = []
@@ -205,7 +203,9 @@ const getOrderDataLine = async () => {
             d.push({
               month: j,
               created: 0,
-              completed: 0
+              passed: 0,
+              failed: 0,
+              halt: 0
             })
           }
           return d
@@ -213,29 +213,40 @@ const getOrderDataLine = async () => {
       })
     }
   }
-  // lấy dữ liệu các đơn hàng tùy theo từng tháng
+  // lấy dữ liệu các đơn đăng kí tùy theo từng tháng
   try {
-    let orders = await get('/order/order', {})
-    if (orders) {
-      orders.forEach((o) => {
-        const timePosted = new Date(o.timePosted)
-        const timeNeeded = new Date(o.timeNeeded)
-        const yearIndexPosted = orderData.value.findIndex((d) => d.year == timePosted.getFullYear())
-        if (yearIndexPosted != -1) {
-          const dataIndexPosted = orderData.value[yearIndexPosted].data.findIndex(
-            (d) => d.month == timePosted.getMonth()
+    let signings = await get('/signing/apply', {})
+    if (signings) {
+      signings.forEach((s) => {
+        const timeModify = new Date(s.timeModify)
+        const timeCreated = new Date(s.createAt)
+
+        const yearIndex = signingData.value.findIndex((d) => d.year == timeModify.getFullYear())
+        if (yearIndex != -1) {
+          const dataIndex = signingData.value[yearIndex].data.findIndex(
+            (d) => d.month == timeModify.getMonth()
           )
-          if (dataIndexPosted != -1) {
-            orderData.value[yearIndexPosted].data[dataIndexPosted].created++
+          if (dataIndex != -1) {
+            if (s.state == 'passed') {
+              signingData.value[yearIndex].data[dataIndex].passed++
+            }
+            if (s.state == 'failed') {
+              signingData.value[yearIndex].data[dataIndex].failed++
+            }
+            if (s.state == 'halt') {
+              signingData.value[yearIndex].data[dataIndex].halt++
+            }
           }
         }
-        const yearIndexNeeded = orderData.value.findIndex((d) => d.year == timeNeeded.getFullYear())
-        if (yearIndexNeeded != -1) {
-          const dataIndexNeeded = orderData.value[yearIndexNeeded].data.findIndex(
-            (d) => d.month == timeNeeded.getMonth()
+        const yearIndexCreated = signingData.value.findIndex(
+          (d) => d.year == timeCreated.getFullYear()
+        )
+        if (yearIndexCreated != -1) {
+          const dataIndexCreated = signingData.value[yearIndexCreated].data.findIndex(
+            (d) => d.month == timeCreated.getMonth()
           )
-          if (dataIndexNeeded != -1) {
-            orderData.value[yearIndexNeeded].data[dataIndexNeeded].completed++
+          if (dataIndexCreated != -1) {
+            signingData.value[yearIndexCreated].data[dataIndexCreated].created++
           }
         }
       })
@@ -254,29 +265,12 @@ const setChart = async () => {
 <template>
   <StatisticChartComponent
     v-if="itemAllQuantities"
-    title="Thống kê số lượng tổng tất cả đơn hàng"
+    title="Thống kê số lượng tổng tất cả đơn đăng kí"
     :items="items"
     :itemQuantities="itemAllQuantities"
     :itemColors="colors"
     :itemHoverColors="colorsHover"
-  ></StatisticChartComponent>
-  <StatisticChartComponent
-    class="mt-6"
-    v-if="itemInprogressQuantities"
-    title="Thống kê số lượng đơn hàng chưa hoàn thành"
-    :items="items"
-    :itemQuantities="itemInprogressQuantities"
-    :itemColors="colors"
-    :itemHoverColors="colorsHover"
-  ></StatisticChartComponent>
-  <StatisticChartComponent
-    class="mt-6"
-    v-if="itemCompletedQuantities"
-    title="Thống kê số lượng đơn hàng đã hoàn thành"
-    :items="items"
-    :itemQuantities="itemCompletedQuantities"
-    :itemColors="colors"
-    :itemHoverColors="colorsHover"
+    style="height: 640px"
   ></StatisticChartComponent>
   <div
     class="mb-6 card position-relative d-flex justify-content-center align-items-start"

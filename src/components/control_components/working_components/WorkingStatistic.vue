@@ -1,16 +1,15 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-// import { get } from '@/utils/httpRequest'
 import Chart from 'primevue/chart'
 import Paginator from 'primevue/paginator'
 import { get } from '@/utils/httpRequest'
 import StatisticChartComponent from '../chart_components/StatisticChartComponent.vue'
 
-onMounted(() => {
+onMounted(async () => {
   getWorkerQuantityDoughnut()
 
-  getWorkerEfficiencyLine()
-  setChart()
+  await getWorkerEfficiencyLine()
+  await setChart()
 })
 
 const workerQuantityDoughnut = ref(null)
@@ -41,10 +40,10 @@ const chartDataLine = ref()
 const chartOptionsLine = ref()
 
 const first = ref(0)
-const totalRecords = ref(3)
 const efficiencies = ref([])
 const workingWorkers = ref(null)
-const defaultYear = 2022
+const defaultYear = import.meta.env.VITE_VUE_APP_YEAR_FOUNDED
+const totalRecords = ref(new Date().getFullYear() - defaultYear + 1)
 
 const getWorkerQuantityDoughnut = async () => {
   try {
@@ -70,18 +69,18 @@ const getWorkerQuantityDoughnut = async () => {
 const setChartDataLine = () => {
   return {
     labels: [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
+      'Tháng 1',
+      'Tháng 2',
+      'Tháng 3',
+      'Tháng 4',
+      'Tháng 5',
+      'Tháng 6',
+      'Tháng 7',
+      'Tháng 8',
+      'Tháng 9',
+      'Tháng 10',
+      'Tháng 11',
+      'Tháng 12'
     ],
     datasets: [
       {
@@ -189,7 +188,7 @@ const getWorkerEfficiencyLine = async () => {
         })()
       })
     } else {
-      efficiencies.value.push({
+      efficiencies.value.unshift({
         year: i,
         data: (() => {
           const d = []
@@ -253,7 +252,7 @@ const getWorkerEfficiencyLine = async () => {
   }
 }
 
-const setChart = () => {
+const setChart = async () => {
   chartDataLine.value = setChartDataLine()
   chartOptionsLine.value = setChartOptionsLine()
 }
@@ -308,7 +307,7 @@ const setChart = () => {
       class="my-3 align-self-center"
       v-model:first="first"
       template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-      :currentPageReportTemplate="`Số liệu năm ${2024 - first} của từ ${2024 - totalRecords + 1} đến ${2024}`"
+      :currentPageReportTemplate="`Số liệu năm ${new Date().getFullYear() - first} của từ ${new Date().getFullYear() - totalRecords + 1} đến ${new Date().getFullYear()}`"
       @page="setChart"
     >
     </Paginator>

@@ -58,4 +58,11 @@ a {
   border-radius: 10px;
   box-shadow: 0 0 5px #ccc;
   padding: 10px;
+  max-width: 100%;
+  min-width: 200px;
+}
+
+/* Màu cho thẻ của panel */
+.tabPanelTagA:hover {
+  color: #dc3545 !important;
 }

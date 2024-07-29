@@ -58,7 +58,7 @@ updateFunction.value = async () => {
     >
       <span class="pi pi-search mb-4 fs-1 fw-bolder"></span>
       <span class="fs-2 fw-bolder">Tuyển dụng đơn hàng</span>
-      <div v-if="isHomePageModify" style="position: absolute; top: 60px; right: -410px">
+      <div v-if="isHomePageModify && orders" style="position: absolute; top: 60px; right: -410px">
         <HP_NewsMultiSelectComponent
           style="width: 200px !important"
           v-model:choices="ordersHot"

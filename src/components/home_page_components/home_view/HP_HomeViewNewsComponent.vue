@@ -80,7 +80,7 @@ onUpdated(() => {
       style="padding: 40px 30px; position: relative"
     >
       <div
-        v-if="isHomePageModify && !isUpdating"
+        v-if="isHomePageModify && !isUpdating && newses"
         style="position: absolute; top: 0; left: -30px"
         class="d-flex"
       >
@@ -118,7 +118,7 @@ onUpdated(() => {
           :selectionLimit="3"
         ></HP_NewsMultiSelectComponent>
       </div>
-      <div v-if="isHomePageModify" style="position: absolute; top: 0; right: -30px">
+      <div v-if="isHomePageModify && newses" style="position: absolute; top: 0; right: -30px">
         <HP_NewsMultiSelectComponent
           style="width: 200px !important"
           v-model:choices="foreign_news"

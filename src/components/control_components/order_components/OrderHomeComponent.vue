@@ -26,10 +26,11 @@ const filtersOS = ref()
 const filtersBV = ref()
 
 const getOrders = async () => {
-  let orders = await get('/order/order')
+  let orders = await get(`/order/order`)
   orders = orders.reverse().map((o) => {
     o.timeNeeded = new Date(o.timeNeeded)
-    o.state = states.find((s) => s.code == o.state)
+    o.state = stateOptions.find((s) => s.code == o.state)
+    o.isHot = isHotOptions.find((h) => h.code == o.isHot)
     return o
   })
   orderList.value = orders
@@ -72,17 +73,14 @@ const handleSeeOrder = (data) => {
   }
 }
 
-const states = [
-  {
-    code: 'inprogress',
-    text: 'Đang thực hiện',
-    severity: 'danger'
-  },
-  {
-    code: 'completed',
-    text: 'Đã hoàn thành',
-    severity: 'success'
-  }
+const stateOptions = [
+  { text: 'Đang thực hiện', code: 'inprogress', severity: 'danger' },
+  { text: 'Đã hoàn thành', code: 'completed', severity: 'success' }
+]
+
+const isHotOptions = [
+  { text: 'Đang nổi bật', code: true, severity: 'success' },
+  { text: 'Không nổi bật', code: false, severity: 'danger' }
 ]
 
 const columns = [
@@ -119,12 +117,19 @@ const columns = [
     severity: 'state.severity'
   },
   {
+    header: 'Đang nổi bật?',
+    width: '12.5%',
+    type: 'tag',
+    param: 'isHot.text',
+    severity: 'isHot.severity'
+  },
+  {
     header: 'Xem',
-    width: '17.5%',
+    width: '5.5%',
     type: 'button',
     iconPos: 'right',
     severity: 'info',
-    label: 'Xem thông tin đơn hàng',
+    label: 'Xem',
     icon: 'pi pi-arrow-right',
     buttonFunction: (data) => {
       handleSeeOrder(data)
@@ -136,112 +141,186 @@ Promise.all([getOrders()])
 </script>
 
 <template>
-  <div v-if="!isOrderShow" class="order__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
+  <TabView
+    v-if="!isOrderShow"
+    :pt="{
+      inkbar: { style: 'background-color: #dc3545; height: 3px ' },
+      navcontent: { class: 'mt-2' }
+    }"
+    class="card mb-6"
+  >
+    <TabPanel
+      header="Cơ khí"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-      Đơn hàng thuộc loại cơ khí
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng đơn hàng cơ khí hiện tại:</div>
-        <div>{{ orderCKList ? orderCKList.length : '' }}</div>
+      <div class="order__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Đơn hàng thuộc loại cơ khí
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng đơn hàng cơ khí hiện tại:</div>
+            <div>{{ orderCKList ? orderCKList.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="orderList && orderCKList"
+          v-model:filters="filtersCK"
+          @clear-filter="clearFiltersCK"
+          :items="orderCKList"
+          :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
+          :tableFor="'đơn hàng'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="orderList && orderCKList"
-      v-model:filters="filtersCK"
-      @clear-filter="clearFiltersCK"
-      :items="orderCKList"
-      :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
-      :tableFor="'đơn hàng'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="Dệt may"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isOrderShow" class="order__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Đơn hàng thuộc loại dệt may
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng đơn hàng dệt may hiện tại:</div>
-        <div>{{ orderDMList ? orderDMList.length : '' }}</div>
+      <div class="order__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Đơn hàng thuộc loại dệt may
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng đơn hàng dệt may hiện tại:</div>
+            <div>{{ orderDMList ? orderDMList.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="orderList && orderDMList"
+          v-model:filters="filtersDM"
+          @clearFilter="clearFiltersDM"
+          :items="orderDMList"
+          :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
+          :tableFor="'đơn hàng'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="orderList && orderDMList"
-      v-model:filters="filtersDM"
-      @clearFilter="clearFiltersDM"
-      :items="orderDMList"
-      :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
-      :tableFor="'đơn hàng'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="Giúp việc"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isOrderShow" class="order__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Đơn hàng thuộc loại giúp việc
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng đơn hàng giúp việc hiện tại:</div>
-        <div>{{ orderOSList ? orderOSList.length : '' }}</div>
+      <div class="order__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Đơn hàng thuộc loại giúp việc
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng đơn hàng giúp việc hiện tại:</div>
+            <div>{{ orderOSList ? orderOSList.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="orderList && orderOSList"
+          v-model:filters="filtersOS"
+          @clearFilter="clearFiltersOS"
+          :items="orderOSList"
+          :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
+          :tableFor="'đơn hàng'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="orderList && orderOSList"
-      v-model:filters="filtersOS"
-      @clearFilter="clearFiltersOS"
-      :items="orderOSList"
-      :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
-      :tableFor="'đơn hàng'"
-      :columns="columns"
-      :type="'info'"
+    </TabPanel>
+    <TabPanel
+      header="Làm nông"
+      :pt="{
+        headerAction: ({ context }) => ({
+          style: { 'text-decoration': 'none', color: context.active ? '#dc3545' : '#64748b' },
+          class: 'tabPanelTagA'
+        })
+      }"
     >
-    </ListComponent>
-  </div>
-  <div v-if="!isOrderShow" class="order__list card position-relative p-4 mb-6">
-    <div
-      style="text-transform: uppercase; color: #ccc; top: 20px; left: 20px; pointer-events: none"
-      class="position-absolute fs-6 fw-bolder"
-    >
-      Đơn hàng thuộc loại làm nông
-    </div>
-    <div class="d-flex flex-row-reverse mb-3">
-      <div class="d-flex align-items-center me-4 border-3 border-info p-2">
-        <div class="me-2">Số lượng đơn hàng làm nông hiện tại:</div>
-        <div>{{ orderBVList ? orderBVList.length : '' }}</div>
+      <div class="order__list card position-relative p-4">
+        <div
+          style="
+            text-transform: uppercase;
+            color: #ccc;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+          "
+          class="position-absolute fs-6 fw-bolder"
+        >
+          Đơn hàng thuộc loại làm nông
+        </div>
+        <div class="d-flex flex-row-reverse mb-3">
+          <div class="d-flex align-items-center me-4 border-3 border-info p-2">
+            <div class="me-2">Số lượng đơn hàng làm nông hiện tại:</div>
+            <div>{{ orderBVList ? orderBVList.length : '' }}</div>
+          </div>
+        </div>
+        <ListComponent
+          v-if="orderList && orderBVList"
+          v-model:filters="filtersBV"
+          @clearFilter="clearFiltersBV"
+          :items="orderBVList"
+          :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
+          :tableFor="'đơn hàng'"
+          :columns="columns"
+          :type="'info'"
+        >
+        </ListComponent>
       </div>
-    </div>
-    <ListComponent
-      v-if="orderList && orderBVList"
-      v-model:filters="filtersBV"
-      @clearFilter="clearFiltersBV"
-      :items="orderBVList"
-      :globalFilterFields="['orderCode', 'orderName', 'companyName', 'state.text']"
-      :tableFor="'đơn hàng'"
-      :columns="columns"
-      :type="'info'"
-    >
-    </ListComponent>
-  </div>
+    </TabPanel>
+  </TabView>
+
   <div v-if="isOrderShow" class="card pt-3">
     <div class="d-flex justify-content-between my-2 pe-5">
       <div
         @click="
           async () => {
-            getOrders()
+            await getOrders()
             isOrderShow = false
           }
         "
@@ -250,7 +329,7 @@ Promise.all([getOrders()])
       >
         <font-awesome-icon :icon="faArrowLeft" />
       </div>
-      <OrderInfoComponent :order="orderInfoShow"></OrderInfoComponent>
+      <OrderInfoComponent style="flex: 1" :order="orderInfoShow"></OrderInfoComponent>
     </div>
   </div>
 </template>

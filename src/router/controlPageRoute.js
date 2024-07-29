@@ -1,6 +1,7 @@
 import workingRoute from './controlChildrenRoutes/workingRoute'
 import accountRoute from './controlChildrenRoutes/accountRoute'
 import orderRoute from './controlChildrenRoutes/orderRoute'
+import signingRoute from './controlChildrenRoutes/signingRoute'
 
 export default [
   {
@@ -10,5 +11,6 @@ export default [
   },
   workingRoute,
   accountRoute,
-  orderRoute
+  orderRoute,
+  signingRoute
 ]

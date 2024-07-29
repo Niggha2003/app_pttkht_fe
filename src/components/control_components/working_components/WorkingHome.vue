@@ -291,9 +291,3 @@ const columns = [
     </TabView>
   </div>
 </template>
-
-<style>
-.tabPanelTagA:hover {
-  color: #dc3545 !important;
-}
-</style>

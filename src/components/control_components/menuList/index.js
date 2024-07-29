@@ -109,8 +109,41 @@ const menu = [
     opened: false,
     type: 'signing',
     icon: faFileContract,
-    to: { name: 'home_page' },
-    listChild: []
+    listChild: [
+      {
+        name: 'Danh sách đơn đăng kí',
+        active: false,
+        icon: faList,
+        to: {
+          name: 'signing',
+          params: {
+            place: 'list'
+          }
+        }
+      },
+      {
+        name: 'Thống kê đơn đăng kí',
+        active: false,
+        icon: faChartSimple,
+        to: {
+          name: 'signing',
+          params: {
+            place: 'stc'
+          }
+        }
+      },
+      {
+        name: 'Đơn đăng kí bị loại',
+        active: false,
+        icon: faBan,
+        to: {
+          name: 'signing',
+          params: {
+            place: 'bl'
+          }
+        }
+      }
+    ]
   },
   {
     name: 'Danh sách người dùng',

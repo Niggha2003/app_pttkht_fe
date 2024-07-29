@@ -17,10 +17,12 @@ const tableFor = props.tableFor
 // header: "", width: "", type: "", param: "",icon, severity buttonFunction: function() {}
 // Trong đó:
 // - param là chỉ mục tham chiếu của object ví dụ (person.name)
-// - type có thể bằng text, date, image, button, tag
+// - type có thể bằng text, date, image, button, tag, dropdown, dropdownTag
 // - nếu có button sẽ có thêm buttonFunction, icon, severity, label, iconPos
 // - nếu có tag sẽ có thêm icon, severity, iconPos
 // - type bằng image thì có thêm urlFolder là đường dẫn của folder chứa hình ảnh đó trong server
+// - type bằng dropdown hoặc dropdownTag thì sẽ có thêm itemList, value (mảng lưu trữ giá trị của các dropdown cùng 1 cột theo thứ tự), key (key cho giá trị để tìm kiếm trong itemList), label(key cho giá trị hiển thị để lựa chọn), dropdownFunction (khi thay đổi giá trị trong dropdown sẽ gọi lại hàm này), forbidChoseBack (không cho chọn lại nếu giá trị này để là true và mỗi item trong itemList phải có index)
+// - type bằng dropdownTag thì itemList có thêm severity cho mỗi item
 const columns = props.columns
 
 // type có thể là info, hoặc là black
@@ -91,11 +93,11 @@ const type = props.type
         }
       }"
     >
-      <template #body="{ data }">
+      <template #body="{ data, index }">
         <img
           v-if="column.type == 'image'"
           :src="importImage(column.urlFolder, getValueByMultipleKey(data, column.param))"
-          style="width: 100px; height: 100px"
+          style="width: 50px; height: 50px"
         />
 
         <span v-if="column.type == 'text'"> {{ getValueByMultipleKey(data, column.param) }}</span>
@@ -121,6 +123,84 @@ const type = props.type
           :severity="getValueByMultipleKey(data, column.severity)"
           :iconPos="column.iconPos"
         ></Tag>
+
+        <Dropdown
+          v-if="column.type == 'dropdown'"
+          :options="column.itemList"
+          :optionLabel="column.label"
+          :optionDisabled="
+            (option) => column.forbidChoseBack && option.index < column.value[index].index
+          "
+          v-model="column.value[index]"
+          @change="
+            ({ value }) => {
+              column.dropdownFunction(data, value)
+            }
+          "
+        >
+          <template #value>
+            <div>
+              {{
+                (() => {
+                  if (column.value[index]) {
+                    return column.value[index][column.label]
+                  } else {
+                    column.value[index] = column.itemList.find(
+                      (i) => i[column.key] == getValueByMultipleKey(data, column.param)
+                    )
+                    return column.value[index][column.label]
+                  }
+                })()
+              }}
+            </div>
+          </template>
+        </Dropdown>
+
+        <Dropdown
+          v-if="column.type == 'dropdownTag'"
+          :options="column.itemList"
+          :optionLabel="column.label"
+          :optionDisabled="
+            (option) => column.forbidChoseBack && option.index < column.value[index].index
+          "
+          v-model="column.value[index]"
+          @change="
+            ({ value }) => {
+              column.dropdownFunction(data, value)
+            }
+          "
+          style="border: none"
+        >
+          <template #value>
+            <Tag
+              :value="
+                (() => {
+                  if (column.value[index]) {
+                    return column.value[index][column.label]
+                  } else {
+                    column.value[index] = column.itemList.find(
+                      (i) => i[column.key] == getValueByMultipleKey(data, column.param)
+                    )
+                    return column.value[index][column.label]
+                  }
+                })()
+              "
+              :severity="column.value[index].severity"
+            ></Tag>
+          </template>
+          <template #option="slotProps">
+            <Tag
+              v-if="slotProps.option.index < column.value[index].index"
+              :value="slotProps.option[column.label]"
+              severity="secondary"
+            ></Tag>
+            <Tag
+              v-else
+              :value="slotProps.option[column.label]"
+              :severity="slotProps.option.severity"
+            ></Tag>
+          </template>
+        </Dropdown>
       </template>
     </Column>
   </DataTable>

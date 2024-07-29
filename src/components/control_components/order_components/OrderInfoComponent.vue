@@ -11,11 +11,13 @@ import FormCoverComponent from '@/components/control_components/content_componen
 
 import modifyDate from '@/helpers/modifyDate'
 import importImage from '@/helpers/importImage'
+import quillEditorModules from '@/helpers/quillEditorModules'
 
 const props = defineProps(['order'])
 const order = ref(props.order)
 
 const isDisabled = ref(true)
+const isParagraphShow = ref(false)
 const updateResult = ref(null)
 
 const employee = ref(null)
@@ -44,9 +46,15 @@ const stateOptions = [
 
 const typeOptions = [
   { text: 'Cơ khí', code: 'ck' },
-  { text: 'Dệt may', code: 'ck' },
-  { text: 'Giúp việc', code: 'ck' },
-  { text: 'Làm nông', code: 'ck' }
+  { text: 'Dệt may', code: 'dm' },
+  { text: 'Giúp việc', code: 'os' },
+  { text: 'Làm nông', code: 'bv' }
+]
+
+// do orderList bên ngoài đã sửa thuộc tính isHot này để phù hợp render ra nên sẽ không cần sửa tại đây
+const isHotOptions = [
+  { text: 'Đang nổi bật', code: true, severity: 'success' },
+  { text: 'Không nổi bật', code: false, severity: 'danger' }
 ]
 
 // khởi tạo các giá trị hiển thị
@@ -56,9 +64,9 @@ order.value.bodyRequire.isSmoke = isSmokeOptions.find(
 order.value.academicLevelRequire = academyLevelOptions.find(
   (a) => a.code == order.value.academicLevelRequire
 )
+order.value.type = typeOptions.find((t) => t.code == order.value.type)
 order.value.timePosted = new Date(order.value.timePosted)
 order.value.timeNeeded = new Date(order.value.timeNeeded)
-order.value.type = typeOptions.find((t) => t.code == order.value.type)
 order.value.salary = order.value.salary * 1000
 
 const orderImg = importImage('order', order.value.photo)
@@ -66,9 +74,18 @@ const orderImg = importImage('order', order.value.photo)
 // gửi dữ liệu update
 const handleUpdateInfo = async () => {
   try {
-    updateResult.value = await post(`/order/order_employee/${order.value._id}/update`, {
-      orderEmployee: {
-        ...order.value
+    updateResult.value = await post(`/order/order/${order.value._id}/update`, {
+      order: {
+        ...order.value,
+        bodyRequire: {
+          ...order.value.bodyRequire,
+          isSmoke: order.value.bodyRequire.isSmoke.code
+        },
+        academicLevelRequire: order.value.academicLevelRequire.code,
+        state: order.value.state.code,
+        isHot: order.value.isHot.code,
+        type: order.value.type.code,
+        salary: order.value.salary / 1000
       }
     })
   } catch (e) {
@@ -92,11 +109,11 @@ onMounted(async () => {
 
     if (fileInput.files && fileInput.files[0]) {
       const reader = new FileReader()
-      order.value.person.photoType = fileInput.files[0].name.split('.')[1]
+      order.value.photoType = fileInput.files[0].name.split('.')[1]
 
       reader.onload = function (e) {
         imageOrder.value.src = e.target.result
-        order.value.person.photo = e.target.result
+        order.value.photo = e.target.result
       }
 
       reader.readAsDataURL(fileInput.files[0])
@@ -111,7 +128,7 @@ const handleChangeModifyMode = (state) => {
 </script>
 
 <template>
-  <div class="worker__info ms-2">
+  <div class="order__info ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
         v-if="!isDisabled"
@@ -144,20 +161,20 @@ const handleChangeModifyMode = (state) => {
         {{ updateResult.status == 200 ? 'Lưu thành công' : 'Lưu không thành công' }}!!!
       </div>
     </div>
-    <form class="pe-4">
+    <form class="pe-4" v-show="!isParagraphShow">
       <fieldset class="row d-flex border-bottom justify-content-between my-2 pb-2">
-        <legend class="p-0 my-2 fs-5 fw-bolder">Thông tin đơn hàng</legend>
+        <legend class="p-0 mb-4 fs-5 fw-bolder">Thông tin đơn hàng</legend>
         <div class="col-5 p-0 border-0">
           <input
             type="file"
             id="fileInput"
             class="d-none"
-            :disabled="isDisabled"
+            :disabled="isDisabled || order.state.code == 'completed'"
             @change="handleImageChange"
           />
           <label class="mb-4 d-flex justify-content-center" for="fileInput">
             <img
-              :class="!isDisabled ? 'hoverOpacity' : ''"
+              :class="!isDisabled || order.state.code == 'completed' ? 'hoverOpacity' : ''"
               ref="imageOrder"
               :src="orderImg"
               alt="Click to upload"
@@ -174,25 +191,41 @@ const handleChangeModifyMode = (state) => {
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="orderName">Tên đơn hàng</label>
-            <InputText id="orderName" v-model="order.orderName" :disabled="isDisabled" />
+            <InputText
+              id="orderName"
+              v-model="order.orderName"
+              :disabled="isDisabled || order.state.code == 'completed'"
+            />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="companyName">Tên công ty</label>
-            <InputText id="companyName" v-model="order.companyName" :disabled="isDisabled" />
+            <InputText
+              id="companyName"
+              v-model="order.companyName"
+              :disabled="isDisabled || order.state.code == 'completed'"
+            />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="companyAddress">Địa chỉ công ty</label>
-            <InputText id="companyAddress" v-model="order.companyAddress" :disabled="isDisabled" />
+            <InputText
+              id="companyAddress"
+              v-model="order.companyAddress"
+              :disabled="isDisabled || order.state.code == 'completed'"
+            />
           </div>
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
             <label for="jobDescription">Mô tả công việc</label>
-            <Textarea id="jobDescription" v-model="order.jobDescription" :disabled="isDisabled" />
+            <Textarea
+              id="jobDescription"
+              v-model="order.jobDescription"
+              :disabled="isDisabled || order.state.code == 'completed'"
+            />
           </div>
         </div>
       </fieldset>
@@ -205,7 +238,7 @@ const handleChangeModifyMode = (state) => {
               id="ageRequire"
               class="mb-3"
               v-model="order.ageRequire"
-              :disabled="isDisabled"
+              :disabled="isDisabled || order.state.code == 'completed'"
             />
           </div>
         </div>
@@ -220,7 +253,7 @@ const handleChangeModifyMode = (state) => {
               checkmark
               :highlightOnSelect="false"
               class="w-full"
-              :disabled="isDisabled"
+              :disabled="isDisabled || order.state.code == 'completed'"
             />
           </div>
         </div>
@@ -231,7 +264,7 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.quantityRequire.male"
                 id="quantityRequireMale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
               />
             </div>
@@ -240,7 +273,7 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.quantityRequire.female"
                 id="quantityRequireFemale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
               />
             </div>
@@ -254,8 +287,9 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.heightRequire.male"
                 id="heightRequireMale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
+                suffix=" cm"
               />
             </div>
             <div class="d-flex flex-row gap-1 mb-2 align-items-center">
@@ -263,8 +297,9 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.heightRequire.female"
                 id="heightRequireFemale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
+                suffix=" cm"
               />
             </div>
           </FormCoverComponent>
@@ -276,8 +311,9 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.weightRequire.male"
                 id="weightRequireMale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
+                suffix=" kg"
               />
             </div>
             <div class="d-flex flex-row gap-1 mb-2 align-items-center">
@@ -285,8 +321,9 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.weightRequire.female"
                 id="weightRequireFemale"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
+                suffix=" kg"
               />
             </div>
           </FormCoverComponent>
@@ -300,9 +337,11 @@ const handleChangeModifyMode = (state) => {
               <InputNumber
                 v-model="order.bodyRequire.eyesight"
                 id="bodyRequireEyesight"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 :pt="{ root: { class: 'flex-grow-1' } }"
                 suffix=" /10"
+                :max="10"
+                :min="0"
               />
             </div>
             <div class="d-flex flex-row gap-1 mb-2 align-items-center">
@@ -315,7 +354,7 @@ const handleChangeModifyMode = (state) => {
                 checkmark
                 :highlightOnSelect="false"
                 class="w-full"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
               />
             </div>
           </FormCoverComponent>
@@ -333,7 +372,7 @@ const handleChangeModifyMode = (state) => {
               currency="VND"
               locale="vi-VN"
               fluid
-              :disabled="true"
+              :disabled="isDisabled || order.state.code == 'completed'"
             />
           </div>
         </div>
@@ -362,7 +401,7 @@ const handleChangeModifyMode = (state) => {
             <div class="flex-auto">
               <Calendar
                 v-model="order.timeNeeded"
-                :disabled="isDisabled"
+                :disabled="isDisabled || order.state.code == 'completed'"
                 showIcon
                 :showOnFocus="false"
                 inputId="timeNeeded"
@@ -387,7 +426,7 @@ const handleChangeModifyMode = (state) => {
               checkmark
               :highlightOnSelect="false"
               class="w-full"
-              :disabled="isDisabled"
+              :disabled="isDisabled || order.state.code == 'completed'"
             />
           </div>
         </div>
@@ -402,7 +441,22 @@ const handleChangeModifyMode = (state) => {
               checkmark
               :highlightOnSelect="false"
               class="w-full"
-              :disabled="isDisabled"
+              :disabled="isDisabled || order.state.code == 'completed'"
+            />
+          </div>
+        </div>
+        <div class="col-5 p-0">
+          <div class="d-flex flex-column gap-1 mb-3">
+            <label for="isHot">Đang nổi bật: </label>
+            <Dropdown
+              v-model="order.isHot"
+              :options="isHotOptions"
+              optionLabel="text"
+              input-id="isHot"
+              checkmark
+              :highlightOnSelect="false"
+              class="w-full"
+              :disabled="isDisabled || order.state.code == 'completed'"
             />
           </div>
         </div>
@@ -417,8 +471,49 @@ const handleChangeModifyMode = (state) => {
             />
           </div>
         </div>
+        <div class="col-5 p-0">
+          <div class="d-flex flex-column gap-1 mb-3">
+            <label for="">Sửa đoạn văn cho đơn hàng: </label>
+            <Button
+              icon="pi pi-info-circle"
+              label="Xem đoạn văn"
+              severity="secondary"
+              style="width: 150px; margin-top: 10px"
+              @click="isParagraphShow = true"
+            />
+          </div>
+        </div>
       </fieldset>
     </form>
+    <div class="my-6" v-show="isParagraphShow">
+      <Editor
+        v-model="order.paragraph"
+        editorStyle="height: 320px, width: 50%"
+        :modules="quillEditorModules"
+        :pt="{ toolbar: { style: 'display: none;' } }"
+        theme="snow"
+        @load="
+          ({ instance }) => {
+            instance.root.innerHTML = order.paragraph
+          }
+        "
+        v-show="!(isDisabled || order.state.code == 'completed')"
+      />
+      <div
+        class="ql-editor card p-3"
+        v-show="isDisabled || order.state.code == 'completed'"
+        v-html="order.paragraph"
+      ></div>
+      <div class="d-flex justify-content-end">
+        <Button
+          icon="pi pi-info-circle"
+          label="Tắt xem đoạn văn"
+          severity="secondary"
+          style="width: 180px; margin-top: 20px"
+          @click="isParagraphShow = false"
+        />
+      </div>
+    </div>
   </div>
 </template>
 

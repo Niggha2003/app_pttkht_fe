@@ -4,6 +4,10 @@ import './assets/scss/output.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js' // Nếu bạn cần sử dụng các tính năng JavaScript của Bootstrap
 
+// theme cho quill
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
