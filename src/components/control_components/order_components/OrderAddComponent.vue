@@ -179,7 +179,7 @@ onMounted(() => {
             addResult.status && addResult.status == 200
               ? 'Thêm thành công'
               : addResult.response.status === 409
-                ? 'Mã đăng nhập đã tồn tại'
+                ? 'Mã đơn hàng đã tồn tại'
                 : 'Cần nhập đầy đủ trường thông tin'
           }}!!!
         </div>

@@ -48,20 +48,20 @@ updateFunction.value = async () => {
   let result
   for (const news of newses.value) {
     if (news.showOnHome != null) {
-      result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 4 } })
+      result = await post(`/news/${news._id}/update`, { showOnHome: 4 })
     }
   }
   for (const news of company_news0.value) {
-    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 0 } })
+    result = await post(`/news/${news._id}/update`, { showOnHome: 0 })
   }
   for (const news of company_news1.value) {
-    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 1 } })
+    result = await post(`/news/${news._id}/update`, { showOnHome: 1 })
   }
   for (const news of company_news2.value) {
-    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 2 } })
+    result = await post(`/news/${news._id}/update`, { showOnHome: 2 })
   }
   for (const news of foreign_news.value) {
-    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 0 } })
+    result = await post(`/news/${news._id}/update`, { showOnHome: 0 })
   }
   return result
 }

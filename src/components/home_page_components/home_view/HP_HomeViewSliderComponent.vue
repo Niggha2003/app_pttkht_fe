@@ -54,12 +54,11 @@ updateFunction.value = async () => {
   let result
   for (const news of focalNews.value) {
     if (news.showOnHome != null) {
-      news.showOnHome = 4
-      result = await post(`/news/${news._id}/update`, { news: news })
+      result = await post(`/news/${news._id}/update`, { showOnHome: 4 })
     }
   }
   for (const news of focalNewsShow.value) {
-    result = await post(`/news/${news._id}/update`, { news: { ...news, showOnHome: 0 } })
+    result = await post(`/news/${news._id}/update`, { showOnHome: 0 })
   }
   return result
 }

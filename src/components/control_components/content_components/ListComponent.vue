@@ -96,14 +96,24 @@ const type = props.type
       <template #body="{ data, index }">
         <img
           v-if="column.type == 'image'"
-          :src="importImage(column.urlFolder, getValueByMultipleKey(data, column.param))"
+          :src="
+            column.urlFolder
+              ? importImage(column.urlFolder, getValueByMultipleKey(data, column.param))
+              : getValueByMultipleKey(data, column.param)
+          "
           style="width: 50px; height: 50px"
         />
 
         <span v-if="column.type == 'text'"> {{ getValueByMultipleKey(data, column.param) }}</span>
 
-        <span v-if="column.type == 'date'">
-          {{ modifyDate(getValueByMultipleKey(data, column.param).toISOString()) }}</span
+        <span
+          v-if="column.type == 'date' && getValueByMultipleKey(data, column.param) != undefined"
+        >
+          {{
+            column.includeTime
+              ? modifyDate(getValueByMultipleKey(data, column.param).toISOString(), true)
+              : modifyDate(getValueByMultipleKey(data, column.param).toISOString())
+          }}</span
         >
 
         <Button

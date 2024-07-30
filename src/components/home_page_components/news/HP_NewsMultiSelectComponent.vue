@@ -60,7 +60,7 @@ const handleChange = () => {
           :alt="slotProps.option[optionsLabel]"
           :src="slotProps.option.pictureBase64"
           style="width: 40px; height: 40px"
-          class="rounded"
+          class="rounded me-2"
         />
         <div class="d-flex flex-column">
           {{ slotProps.option[optionsLabel] }}

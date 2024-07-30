@@ -3,15 +3,13 @@ import {
   faFolder,
   faFileContract,
   faAddressBook,
-  faPager
-} from '@fortawesome/free-solid-svg-icons'
-
-import {
+  faPager,
   faList,
   faChartSimple,
   faBan,
   faUserPlus,
-  faFolderPlus
+  faFolderPlus,
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons'
 
 const menu = [
@@ -65,7 +63,6 @@ const menu = [
     opened: false,
     type: 'ordering',
     icon: faFolder,
-    to: { name: 'home_page' },
     listChild: [
       {
         name: 'Danh sách đơn hàng',
@@ -95,6 +92,49 @@ const menu = [
         icon: faFolderPlus,
         to: {
           name: 'ordering',
+          params: {
+            place: 'add'
+          }
+        }
+      }
+    ]
+  },
+  {
+    name: 'Quản lí tin tức',
+    active: false,
+    show: true,
+    opened: false,
+    type: 'news',
+    icon: faNewspaper,
+    listChild: [
+      {
+        name: 'Danh sách tin tức',
+        active: false,
+        icon: faList,
+        to: {
+          name: 'news',
+          params: {
+            place: 'list'
+          }
+        }
+      },
+      {
+        name: 'Thống kê tin tức',
+        active: false,
+        icon: faChartSimple,
+        to: {
+          name: 'news',
+          params: {
+            place: 'stc'
+          }
+        }
+      },
+      {
+        name: 'Tạo tin tức mới',
+        active: false,
+        icon: faFolderPlus,
+        to: {
+          name: 'news',
           params: {
             place: 'add'
           }
