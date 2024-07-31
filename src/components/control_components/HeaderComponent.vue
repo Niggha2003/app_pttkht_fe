@@ -98,7 +98,7 @@ const handleSignOut = () => {
           :to="{
             name: 'home'
           }"
-          class="btn btn-outline-info border-0"
+          class="btn btn-outline-info border-0 text-info"
           style="text-decoration: none"
           >Trang cá nhân</router-link
         >
@@ -194,5 +194,9 @@ const handleSignOut = () => {
 
 .notice-items:hover {
   background-color: rgba(142, 129, 129, 0.133);
+}
+
+.btn-outline-info:hover {
+  color: white !important;
 }
 </style>

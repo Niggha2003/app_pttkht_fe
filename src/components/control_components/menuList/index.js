@@ -20,7 +20,8 @@ const menu = [
     opened: false,
     type: 'working',
     icon: faPeopleGroup,
-    show: true,
+    show: false,
+    role: 'working',
     listChild: [
       {
         name: 'Danh sách lao động',
@@ -60,10 +61,11 @@ const menu = [
   {
     name: 'Quản lí đơn hàng',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'ordering',
     icon: faFolder,
+    role: 'ordering',
     listChild: [
       {
         name: 'Danh sách đơn hàng',
@@ -103,9 +105,10 @@ const menu = [
   {
     name: 'Quản lí tin tức',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'news',
+    role: 'ordering',
     icon: faNewspaper,
     listChild: [
       {
@@ -146,10 +149,11 @@ const menu = [
   {
     name: 'Quản lí vé máy bay',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'flight',
     icon: faPlane,
+    role: 'ordering',
     listChild: [
       {
         name: 'Danh sách vé máy bay',
@@ -189,9 +193,10 @@ const menu = [
   {
     name: 'Quản lí đơn đăng kí',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'signing',
+    role: 'signing',
     icon: faFileContract,
     listChild: [
       {
@@ -232,10 +237,11 @@ const menu = [
   {
     name: 'Danh sách người dùng',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'employee',
     icon: faAddressBook,
+    role: 'admin',
     listChild: [
       {
         name: 'Danh sách tài khoản',
@@ -275,9 +281,10 @@ const menu = [
   {
     name: 'Xem trang web',
     active: false,
-    show: true,
+    show: false,
     opened: false,
     type: 'web',
+    role: 'ordering',
     icon: faPager,
     to: { name: 'home_page' },
     listChild: []
@@ -323,6 +330,20 @@ export const MenuItemReset = (menu) => {
     menuItem.opened = false
     menuItem.listChild.forEach((child) => {
       child.active = false
+    })
+  })
+  return menu
+}
+
+export const MenuShowItem = (menu, items = []) => {
+  menu.forEach((menuItem) => {
+    menuItem.show = false
+  })
+  items.forEach((item) => {
+    menu.forEach((menuItem, index) => {
+      if (menuItem.role == item) {
+        menu[index].show = true
+      }
     })
   })
   return menu

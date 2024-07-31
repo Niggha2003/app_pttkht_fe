@@ -4,17 +4,20 @@ import { ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 import { onMounted } from 'vue'
 
+import Toast from 'primevue/toast'
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
+import { useToast } from 'primevue/usetoast'
 import importImage from '@/helpers/importImage'
 import md5Hash from '@/helpers/md5Hash'
 
 import FormCoverComponent from '../content_components/FormCoverComponent.vue'
 
+const toast = useToast()
 const props = defineProps(['account'])
 const account = ref(props.account)
 const isDisabled = ref(true)
@@ -106,7 +109,7 @@ const handleUpdateInfo = async () => {
   }
   setTimeout(() => {
     updateResult.value = null
-  }, 1000)
+  }, 3000)
 }
 
 // thay đổi hình ảnh
@@ -135,6 +138,7 @@ const handleChangeModifyMode = (state) => {
 </script>
 
 <template>
+  <Toast />
   <div class="worker__info ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
@@ -157,15 +161,28 @@ const handleChangeModifyMode = (state) => {
         v-if="!isDisabled"
         class="btn btn-success me-1"
         style="width: 100px"
-        @click="handleUpdateInfo"
+        @click="
+          async () => {
+            await handleUpdateInfo()
+            toast.add({
+              severity:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'success'
+                  : 'error',
+              summary:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Lưu thành công'
+                  : 'Lưu thất bại',
+              detail:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Bạn đã sửa thông tin thành công'
+                  : 'Bạn đã sửa thông tin thất bại',
+              life: 3000
+            })
+          }
+        "
       >
         Lưu
-      </div>
-      <div
-        v-if="updateResult && updateResult.status && !isDisabled"
-        style="color: green; font-weight: bold; margin-right: 20px"
-      >
-        {{ updateResult.status == 200 ? 'Lưu thành công' : 'Lưu không thành công' }}!!!
       </div>
     </div>
     <form class="pe-4">

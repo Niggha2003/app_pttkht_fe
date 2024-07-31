@@ -8,11 +8,12 @@ const toast = useToast()
 const props = defineProps(['saveFunction'])
 const state = defineModel('state')
 const store = useStore()
+const isHomePageModifyShow = store.state.isHomePageModifyShow
 const save_function = props.saveFunction
 </script>
 
 <template>
-  <div style="position: fixed; bottom: 20px; right: 100px; z-index: 1">
+  <div v-if="isHomePageModifyShow" style="position: fixed; bottom: 20px; right: 100px; z-index: 1">
     <!-- <div
       v-if="result != null"
       :class="

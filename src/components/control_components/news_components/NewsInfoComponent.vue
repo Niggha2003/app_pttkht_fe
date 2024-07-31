@@ -4,13 +4,16 @@ import { ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 import { onMounted } from 'vue'
 
+import Toast from 'primevue/toast'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
 
 import quillEditorModules from '@/helpers/quillEditorModules'
+import { useToast } from 'primevue/usetoast'
 
 const props = defineProps(['news'])
 const news = ref(props.news)
+const toast = useToast()
 
 const isDisabled = ref(true)
 const isParagraphShow = ref(false)
@@ -47,7 +50,7 @@ const handleUpdateInfo = async () => {
   }
   setTimeout(() => {
     updateResult.value = null
-  }, 1000)
+  }, 3000)
 }
 
 onMounted(async () => {
@@ -75,6 +78,8 @@ const handleChangeModifyMode = (state) => {
 </script>
 
 <template>
+  <Toast />
+
   <div class="news__info ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
@@ -97,7 +102,26 @@ const handleChangeModifyMode = (state) => {
         v-if="!isDisabled"
         class="btn btn-success me-1"
         style="width: 100px"
-        @click="handleUpdateInfo"
+        @click="
+          async () => {
+            await handleUpdateInfo()
+            toast.add({
+              severity:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'success'
+                  : 'error',
+              summary:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Lưu thành công'
+                  : 'Lưu thất bại',
+              detail:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Bạn đã sửa thông tin thành công'
+                  : 'Bạn đã sửa thông tin thất bại',
+              life: 3000
+            })
+          }
+        "
       >
         Lưu
       </div>

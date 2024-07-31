@@ -2,17 +2,20 @@
 import { onBeforeMount, ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 
+import Toast from 'primevue/toast'
 import Calendar from 'primevue/calendar'
 import Slider from 'primevue/slider'
 import InputNumber from 'primevue/inputnumber'
 import Chart from 'primevue/chart'
 
 import getMonthDifference from '@/helpers/getMonthDifference'
+import { useToast } from 'primevue/usetoast'
 
 const emit = defineEmits(['saveWorker'])
 const props = defineProps(['worker'])
 const worker = ref(props.worker)
 const isDisabled = defineModel('isDisabled')
+const toast = useToast()
 
 const updateResult = ref(null)
 const isSumCalculate = ref(false)
@@ -174,7 +177,7 @@ const handleUpdateInfo = async () => {
   emit('saveWorker', worker.value._id, 2)
   setTimeout(() => {
     updateResult.value = null
-  }, 1000)
+  }, 3000)
 
   // khởi tạo dữ liệu biểu đồ thống kê
   chartData.value = setChartData()
@@ -183,13 +186,34 @@ const handleUpdateInfo = async () => {
 </script>
 
 <template>
+  <Toast />
+
   <div v-if="worker.state == 'abroad' || worker.state == 'back'" class="worker__orderInfo ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
         v-if="!isDisabled && !isSumCalculate"
         class="btn btn-success me-1"
         style="width: 100px"
-        @click="handleUpdateInfo"
+        @click="
+          async () => {
+            await handleUpdateInfo()
+            toast.add({
+              severity:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'success'
+                  : 'error',
+              summary:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Lưu thành công'
+                  : 'Lưu thất bại',
+              detail:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Bạn đã sửa thông tin thành công'
+                  : 'Bạn đã sửa thông tin thất bại',
+              life: 3000
+            })
+          }
+        "
       >
         Lưu
       </div>

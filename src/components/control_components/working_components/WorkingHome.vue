@@ -229,7 +229,7 @@ const columns = [
         Tắt sửa
       </div>
       <div
-        v-if="isDisabled"
+        v-if="workerInfoShow.state != 'back' && isDisabled"
         class="btn btn-danger me-1"
         style="width: 100px; height: 35px"
         @click="handleChangeModifyMode(false)"

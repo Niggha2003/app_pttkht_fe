@@ -9,13 +9,16 @@ import Dropdown from 'primevue/dropdown'
 import Textarea from 'primevue/textarea'
 import Steps from 'primevue/steps'
 import Tag from 'primevue/tag'
+import Toast from 'primevue/toast'
 
 import { faCircle } from '@fortawesome/free-solid-svg-icons'
+import { useToast } from 'primevue/usetoast'
 
 const emit = defineEmits(['saveWorker'])
 const props = defineProps(['worker'])
 const worker = ref(props.worker)
 const isDisabled = defineModel('isDisabled')
+const toast = useToast()
 
 const orders = ref(null)
 const orderInfo = ref('')
@@ -69,7 +72,7 @@ const handleUpdateInfo = async () => {
   emit('saveWorker', worker.value._id, 1)
   setTimeout(() => {
     updateResult.value = null
-  }, 1000)
+  }, 3000)
 }
 
 // lấy danh sách đơn hàng
@@ -109,13 +112,33 @@ onMounted(async () => {
 </script>
 
 <template>
+  <Toast />
   <div class="worker__orderInfo ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
         v-if="!isDisabled"
         class="btn btn-success me-1"
         style="width: 100px"
-        @click="handleUpdateInfo"
+        @click="
+          async () => {
+            await handleUpdateInfo()
+            toast.add({
+              severity:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'success'
+                  : 'error',
+              summary:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Lưu thành công'
+                  : 'Lưu thất bại',
+              detail:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Bạn đã sửa thông tin thành công'
+                  : 'Bạn đã sửa thông tin thất bại',
+              life: 3000
+            })
+          }
+        "
       >
         Lưu
       </div>

@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { post } from '@/utils/httpRequest'
 import { onMounted } from 'vue'
 
+import Toast from 'primevue/toast'
 import Password from 'primevue/password'
 import Dropdown from 'primevue/dropdown'
 import Calendar from 'primevue/calendar'
@@ -11,6 +12,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
 import FormCoverComponent from '../content_components/FormCoverComponent.vue'
+import { useToast } from 'primevue/usetoast'
 
 import importImage from '@/helpers/importImage'
 import md5Hash from '@/helpers/md5Hash'
@@ -19,6 +21,7 @@ const emit = defineEmits(['saveWorker'])
 const props = defineProps(['worker'])
 const worker = ref(props.worker)
 const isDisabled = defineModel('isDisabled')
+const toast = useToast()
 
 const updateResult = ref(null)
 const initialWorkerPassword = props.worker.accountTraining.password
@@ -115,7 +118,7 @@ const handleUpdateInfo = async () => {
   emit('saveWorker', worker.value._id, 0)
   setTimeout(() => {
     updateResult.value = null
-  }, 1000)
+  }, 3000)
 }
 
 // thay đổi hình ảnh
@@ -139,13 +142,33 @@ onMounted(() => {
 </script>
 
 <template>
+  <Toast />
   <div class="worker__info ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
         v-if="!isDisabled"
         class="btn btn-success me-1"
         style="width: 100px"
-        @click="handleUpdateInfo"
+        @click="
+          async () => {
+            await handleUpdateInfo()
+            toast.add({
+              severity:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'success'
+                  : 'error',
+              summary:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Lưu thành công'
+                  : 'Lưu thất bại',
+              detail:
+                updateResult && updateResult.status && !isDisabled && updateResult.status == 200
+                  ? 'Bạn đã sửa thông tin thành công'
+                  : 'Bạn đã sửa thông tin thất bại',
+              life: 3000
+            })
+          }
+        "
       >
         Lưu
       </div>

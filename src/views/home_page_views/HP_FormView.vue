@@ -198,14 +198,18 @@ Promise.all([getInfoCompany()])
       <div
         :class="`fw-bolder ${result && result.status && result.status == 200 ? 'text-success' : 'text-danger'} `"
       >
-        {{ result && result.status && result.status == 200 ? `
         <div>
-          Ứng tuyển thành công vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!!
+          {{
+            result && result.status && result.status == 200
+              ? ' Ứng tuyển thành công vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!!'
+              : result && result.status && result.status == 400
+                ? 'Mời nhập đầy đủ trường thông tin!!!'
+                : result && result.status && result.status == 404
+                  ? 'Mã đơn hàng không hợp lệ!!!'
+                  : `Email không hợp lệ hoặc số điện thoại không hợp lệ`
+          }}
         </div>
         <div>Trân trọng!!</div>
-        ` : result && result.status && result.status == 400 ? 'Mời nhập đầy đủ trường thông tin!!!'
-        : result && result.status && result.status == 404 ? 'Mã đơn hàng không hợp lệ!!!' : `Email
-        không hợp lệ hoặc số điện thoại không hợp lệ` }}
       </div>
     </div>
   </Dialog>
