@@ -141,15 +141,17 @@ onMounted(async () => {
                   workerStateIndex = state.d_activeStep
                   return { class: 'ps-0' }
                 },
-                menuitem: ({ context }) => ({
-                  class: {
-                    animationForPseudoBefore: true,
-                    animationForActivePseudoBefore: context.index <= workerStateIndex
-                  },
-                  style: 'flex: 1; height: 100px; cursor: pointer; overflow: visible'
-                }),
                 step: ({ context }) => {
                   context.disabled = true
+                },
+                menuitem: ({ context }) => {
+                  return {
+                    class: {
+                      animationForPseudoBefore: true,
+                      animationForActivePseudoBefore: context.index <= workerStateIndex
+                    },
+                    style: 'flex: 1; height: 100px; cursor: pointer; overflow: visible'
+                  }
                 }
               }"
             >

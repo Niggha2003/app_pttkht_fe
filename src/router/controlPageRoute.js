@@ -3,6 +3,7 @@ import accountRoute from './controlChildrenRoutes/accountRoute'
 import orderRoute from './controlChildrenRoutes/orderRoute'
 import signingRoute from './controlChildrenRoutes/signingRoute'
 import newsRoute from './controlChildrenRoutes/newsRoute'
+import flightRoute from './controlChildrenRoutes/flightRoute'
 
 export default [
   {
@@ -14,5 +15,6 @@ export default [
   accountRoute,
   orderRoute,
   signingRoute,
-  newsRoute
+  newsRoute,
+  flightRoute
 ]

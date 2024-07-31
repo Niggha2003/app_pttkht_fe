@@ -20,7 +20,7 @@ const accountComponents = [
 export default {
   path: '/control/account/:place?',
   name: 'employee',
-  component: () => import('@/views/control_views/AccountView.vue'),
+  component: () => import('@/views/control_views/ControlView.vue'),
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent

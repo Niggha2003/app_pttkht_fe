@@ -20,7 +20,7 @@ const signingComponents = [
 export default {
   path: '/control/signing/:place?',
   name: 'signing',
-  component: () => import('@/views/control_views/SigningView.vue'),
+  component: () => import('@/views/control_views/ControlView.vue'),
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent

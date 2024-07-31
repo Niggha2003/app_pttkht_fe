@@ -75,7 +75,7 @@ const handleChangeModifyMode = (state) => {
 </script>
 
 <template>
-  <div class="order__info ms-2">
+  <div class="news__info ms-2">
     <div class="modify__choice d-flex flex-row-reverse">
       <div
         v-if="!isDisabled"

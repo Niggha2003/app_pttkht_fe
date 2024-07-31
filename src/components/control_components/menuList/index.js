@@ -9,7 +9,8 @@ import {
   faBan,
   faUserPlus,
   faFolderPlus,
-  faNewspaper
+  faNewspaper,
+  faPlane
 } from '@fortawesome/free-solid-svg-icons'
 
 const menu = [
@@ -135,6 +136,49 @@ const menu = [
         icon: faFolderPlus,
         to: {
           name: 'news',
+          params: {
+            place: 'add'
+          }
+        }
+      }
+    ]
+  },
+  {
+    name: 'Quản lí vé máy bay',
+    active: false,
+    show: true,
+    opened: false,
+    type: 'flight',
+    icon: faPlane,
+    listChild: [
+      {
+        name: 'Danh sách vé máy bay',
+        active: false,
+        icon: faList,
+        to: {
+          name: 'flight',
+          params: {
+            place: 'list'
+          }
+        }
+      },
+      {
+        name: 'Thống kê vé máy bay',
+        active: false,
+        icon: faChartSimple,
+        to: {
+          name: 'flight',
+          params: {
+            place: 'stc'
+          }
+        }
+      },
+      {
+        name: 'Tạo vé máy bay mới',
+        active: false,
+        icon: faFolderPlus,
+        to: {
+          name: 'flight',
           params: {
             place: 'add'
           }

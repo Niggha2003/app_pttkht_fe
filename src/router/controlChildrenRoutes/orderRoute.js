@@ -20,7 +20,7 @@ const orderComponents = [
 export default {
   path: '/control/order/:place?',
   name: 'ordering',
-  component: () => import('@/views/control_views/OrderView.vue'),
+  component: () => import('@/views/control_views/ControlView.vue'),
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent

@@ -302,7 +302,7 @@ const setChart = async () => {
         z-index: 1;
       "
     >
-      Thống kê lao động tùy theo năng xuất làm việc:
+      Thống kê các loại đơn hàng
     </div>
     <Chart
       type="line"

@@ -20,7 +20,7 @@ const newsComponents = [
 export default {
   path: '/control/news/:place?',
   name: 'news',
-  component: () => import('@/views/control_views/NewsView.vue'),
+  component: () => import('@/views/control_views/ControlView.vue'),
   props: (route) => {
     // khởi tạo component cho mỗi lần chạy link khác nhau
     let innerComponent

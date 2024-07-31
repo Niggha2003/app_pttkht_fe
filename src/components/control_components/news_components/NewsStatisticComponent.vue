@@ -177,7 +177,7 @@ const getNewsDataLine = async () => {
       })
     }
   }
-  // lấy dữ liệu các đơn hàng tùy theo từng tháng
+  // lấy dữ liệu các tin tức tùy theo từng tháng
   try {
     let news = await get('/news', {})
     if (news) {
@@ -213,27 +213,9 @@ const setChart = async () => {
 <template>
   <StatisticChartComponent
     v-if="itemAllQuantities"
-    title="Thống kê số lượng tổng tất cả đơn hàng"
+    title="Thống kê số lượng tin tức"
     :items="items"
     :itemQuantities="itemAllQuantities"
-    :itemColors="colors"
-    :itemHoverColors="colorsHover"
-  ></StatisticChartComponent>
-  <StatisticChartComponent
-    class="mt-6"
-    v-if="itemInprogressQuantities"
-    title="Thống kê số lượng đơn hàng chưa hoàn thành"
-    :items="items"
-    :itemQuantities="itemInprogressQuantities"
-    :itemColors="colors"
-    :itemHoverColors="colorsHover"
-  ></StatisticChartComponent>
-  <StatisticChartComponent
-    class="mt-6"
-    v-if="itemCompletedQuantities"
-    title="Thống kê số lượng đơn hàng đã hoàn thành"
-    :items="items"
-    :itemQuantities="itemCompletedQuantities"
     :itemColors="colors"
     :itemHoverColors="colorsHover"
   ></StatisticChartComponent>
@@ -261,7 +243,7 @@ const setChart = async () => {
         z-index: 1;
       "
     >
-      Thống kê lao động tùy theo năng xuất làm việc:
+      Thống kê các loại tin tức
     </div>
     <Chart
       type="line"

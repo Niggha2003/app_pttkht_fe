@@ -261,7 +261,7 @@ const setChart = async () => {
 <template>
   <StatisticChartComponent
     v-if="workerQuantityDoughnut"
-    title="Thống kê số lượng nhân viên"
+    title="Thống kê số lượng lao động"
     :items="items"
     :itemQuantities="workerQuantityDoughnut"
     :itemColors="colorsDoughnut"

@@ -8,7 +8,7 @@ import StatisticChartComponent from '../chart_components/StatisticChartComponent
 onMounted(async () => {
   getItemQuantity()
 
-  await getSigningDataLine()
+  await getFlightDataLine()
   await setChart()
 })
 
@@ -16,53 +16,25 @@ const itemAllQuantities = ref(null)
 
 const colors = [
   'rgba(255, 99, 132, 1)', // Red
-  'rgba(54, 162, 235, 1)', // Blue
-  'rgba(153, 102, 255, 1)', //purple
-  'rgba(75, 192, 192, 1)', // Green
-  'rgba(255, 159, 64, 1)', // orange
-  'rgba(0, 0, 0, 1)'
+  'rgba(75, 192, 192, 1)' // Green
 ]
 const colorsHover = [
   'rgba(255, 99, 132, 0.4)', // Red
-  'rgba(54, 162, 235, 0.4)', // Blue
-  'rgba(153, 102, 255, 0.4)', //purple
-  'rgba(75, 192, 192, 0.4)', // Green
-  'rgba(255, 159, 64, 0.4)', // orange
-  'rgba(0, 0, 0, 0.4)'
+  'rgba(75, 192, 192, 0.4)' // Green
 ]
-const items = [
-  'Chưa liên hệ',
-  'Đã liên hệ đang chờ gửi hồ sơ',
-  'Đã nộp hồ sơ đang chờ kiểm tra',
-  'Hồ sơ hợp lệ',
-  'Hồ sơ không hợp lệ',
-  'Cấm'
-]
+const items = ['Vé máy bay chưa bay', 'Vé máy bay đã bay']
 
 const getItemQuantity = async () => {
   try {
-    itemAllQuantities.value = [0, 0, 0, 0, 0, 0]
+    itemAllQuantities.value = [0, 0]
 
-    let signings = await get('/signing/apply')
-    if (signings) {
-      signings.forEach((s) => {
-        if (s.state == 'hct') {
+    let flights = await get('/order/flight')
+    if (flights) {
+      flights.forEach((fl) => {
+        if (new Date() > new Date(fl.time)) {
           itemAllQuantities.value[0]++
-        }
-        if (s.state == 'ipg') {
+        } else {
           itemAllQuantities.value[1]++
-        }
-        if (s.state == 'sent') {
-          itemAllQuantities.value[2]++
-        }
-        if (s.state == 'passed') {
-          itemAllQuantities.value[3]++
-        }
-        if (s.state == 'failed') {
-          itemAllQuantities.value[4]++
-        }
-        if (s.state == 'halt') {
-          itemAllQuantities.value[5]++
         }
       })
     }
@@ -75,7 +47,7 @@ const chartDataLine = ref()
 const chartOptionsLine = ref()
 
 const first = ref(0)
-const signingData = ref([])
+const flightData = ref([])
 const defaultYear = import.meta.env.VITE_VUE_APP_YEAR_FOUNDED
 const totalRecords = ref(new Date().getFullYear() - defaultYear + 1)
 
@@ -97,37 +69,20 @@ const setChartDataLine = () => {
     ],
     datasets: [
       {
-        label: 'Số lượng đơn đăng kí được gửi đến',
-        data: signingData.value[first.value].data.map((d) => d.created),
+        label: 'Số lượng vé máy bay đã bay',
+        data: flightData.value[first.value].data.map((d) => d.completed),
         fill: false,
         tension: 0.4,
-        borderColor: 'orange',
-        yAxisID: 'y' // Chỉ định trục y1 cho dataset này
+        borderColor: 'green',
+        yAxisID: 'y1' // Chỉ định trục y1 cho dataset này
       },
       {
-        label: 'Số lượng đơn đăng kí hợp lệ',
-        data: signingData.value[first.value].data.map((d) => d.completed),
-        fill: true,
-        borderColor: 'success',
-        tension: 0.4,
-        yAxisID: 'y' // Chỉ định trục y cho dataset này
-      },
-      {
-        label: 'Số lượng đơn đăng kí không hợp lệ',
-        data: signingData.value[first.value].data.map((d) => d.created),
+        label: 'Số lượng vé máy bay chưa bay',
+        data: flightData.value[first.value].data.map((d) => d.notCompleted),
         fill: false,
         tension: 0.4,
-        borderColor: 'gray',
-        yAxisID: 'y' // Chỉ định trục y1 cho dataset này
-      },
-      {
-        label: 'Số lượng đơn đăng kí bị cấm',
-        data: signingData.value[first.value].data.map((d) => d.completed),
-        fill: true,
-        borderColor: 'black',
-        tension: 0.4,
-        backgroundColor: '#ccc',
-        yAxisID: 'y' // Chỉ định trục y cho dataset này
+        borderColor: 'red',
+        yAxisID: 'y1' // Chỉ định trục y1 cho dataset này
       }
     ]
   }
@@ -168,44 +123,53 @@ const setChartOptionsLine = () => {
           display: true,
           drawBorder: true
         }
+      },
+      y1: {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        ticks: {
+          color: textColorSecondary
+        },
+        grid: {
+          drawOnChartArea: false,
+          display: true,
+          drawBorder: true
+        }
       }
     }
   }
 }
 
-const getSigningDataLine = async () => {
+const getFlightDataLine = async () => {
   // khởi tạo biến lưu trữ thông tin dữ liệu
   const thisDate = new Date()
   for (let i = defaultYear; i <= thisDate.getFullYear(); i++) {
     if (i == thisDate.getFullYear()) {
-      signingData.value.unshift({
+      flightData.value.unshift({
         year: i,
         data: (() => {
           const d = []
           for (let j = 0; j <= thisDate.getMonth(); j++) {
             d.push({
               month: j,
-              created: 0,
-              passed: 0,
-              failed: 0,
-              halt: 0
+              completed: 0,
+              notCompleted: 0
             })
           }
           return d
         })()
       })
     } else {
-      signingData.value.unshift({
+      flightData.value.unshift({
         year: i,
         data: (() => {
           const d = []
           for (let j = 0; j < 12; j++) {
             d.push({
               month: j,
-              created: 0,
-              passed: 0,
-              failed: 0,
-              halt: 0
+              completed: 0,
+              notCompleted: 0
             })
           }
           return d
@@ -213,40 +177,24 @@ const getSigningDataLine = async () => {
       })
     }
   }
-  // lấy dữ liệu các đơn đăng kí tùy theo từng tháng
+  // lấy dữ liệu các vé máy bay tùy theo từng tháng
   try {
-    let signings = await get('/signing/apply', {})
-    if (signings) {
-      signings.forEach((s) => {
-        const timeModify = new Date(s.timeModify)
-        const timeCreated = new Date(s.createAt)
+    let flights = await get('/order/flight', {})
+    if (flights) {
+      flights.forEach((fl) => {
+        const timeFly = new Date(fl.time)
 
-        const yearIndex = signingData.value.findIndex((d) => d.year == timeModify.getFullYear())
+        const yearIndex = flightData.value.findIndex((d) => d.year == timeFly.getFullYear())
         if (yearIndex != -1) {
-          const dataIndex = signingData.value[yearIndex].data.findIndex(
-            (d) => d.month == timeModify.getMonth()
+          const dataIndex = flightData.value[yearIndex].data.findIndex(
+            (d) => d.month == timeFly.getMonth()
           )
           if (dataIndex != -1) {
-            if (s.state == 'passed') {
-              signingData.value[yearIndex].data[dataIndex].passed++
+            if (new Date() > new Date(fl.time)) {
+              flightData.value[yearIndex].data[dataIndex].notCompleted++
+            } else {
+              flightData.value[yearIndex].data[dataIndex].completed++
             }
-            if (s.state == 'failed') {
-              signingData.value[yearIndex].data[dataIndex].failed++
-            }
-            if (s.state == 'halt') {
-              signingData.value[yearIndex].data[dataIndex].halt++
-            }
-          }
-        }
-        const yearIndexCreated = signingData.value.findIndex(
-          (d) => d.year == timeCreated.getFullYear()
-        )
-        if (yearIndexCreated != -1) {
-          const dataIndexCreated = signingData.value[yearIndexCreated].data.findIndex(
-            (d) => d.month == timeCreated.getMonth()
-          )
-          if (dataIndexCreated != -1) {
-            signingData.value[yearIndexCreated].data[dataIndexCreated].created++
           }
         }
       })
@@ -265,12 +213,11 @@ const setChart = async () => {
 <template>
   <StatisticChartComponent
     v-if="itemAllQuantities"
-    title="Thống kê số lượng tổng tất cả đơn đăng kí"
+    title="Thống kê số lượng tổng tất cả vé máy bay"
     :items="items"
     :itemQuantities="itemAllQuantities"
     :itemColors="colors"
     :itemHoverColors="colorsHover"
-    style="height: 640px"
   ></StatisticChartComponent>
   <div
     class="mb-6 card position-relative d-flex justify-content-center align-items-start"
@@ -296,7 +243,7 @@ const setChart = async () => {
         z-index: 1;
       "
     >
-      Thống kê các loại đơn đăng ký
+      Thống kê tất các các chuyến bay:
     </div>
     <Chart
       type="line"

@@ -247,7 +247,7 @@ onMounted(() => {
         class="d-flex justify-content-center py-2"
       >
         <Button
-          label="Tiếp tục thêm mới đơn hàng"
+          label="Tiếp tục thêm mới tin tức"
           severity="secondary"
           icon="pi pi-user-plus"
           iconPos="right"
