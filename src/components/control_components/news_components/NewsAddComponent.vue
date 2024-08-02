@@ -55,6 +55,7 @@ const handleAddNews = async () => {
       }
     })
     addResultVisible.value = true
+    isParagraphShow.value = false
   } catch (e) {
     addResult.value = { response: { status: 500 } }
     addResultVisible.value = true
@@ -162,9 +163,8 @@ onMounted(() => {
             <input type="file" id="fileInput" class="d-none" @change="handleImageChange" />
             <label class="mb-4 d-flex justify-content-center" for="fileInput">
               <img
-                :class="!isDisabled ? 'hoverOpacity' : ''"
+                :class="'hoverOpacity'"
                 ref="imageNews"
-                :src="newsImg"
                 alt="Click to upload"
                 style="width: 300px"
               />

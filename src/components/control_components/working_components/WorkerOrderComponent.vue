@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { post, get } from '@/utils/httpRequest'
 
 import modifyDate from '@/helpers/modifyDate'
@@ -109,6 +109,18 @@ onMounted(async () => {
   await getFlight()
   setOrderInfo(worker.value.order)
 })
+
+// watch hoạt động trực tiếp trên ref
+watch(workerStateIndex, async (newWorkerStateIndex, oldWorkerStateIndex) => {
+  if (oldWorkerStateIndex > newWorkerStateIndex) {
+    toast.add({
+      severity: 'error',
+      summary: 'Cảnh báo',
+      detail: 'Bạn không nên quay về trạng thái trước đó',
+      life: 3000
+    })
+  }
+})
 </script>
 
 <template>
@@ -134,7 +146,7 @@ onMounted(async () => {
               detail:
                 updateResult && updateResult.status && !isDisabled && updateResult.status == 200
                   ? 'Bạn đã sửa thông tin thành công'
-                  : 'Bạn đã sửa thông tin thất bại',
+                  : 'Bạn đã sửa thiếu thông tin ( Thất bại )',
               life: 3000
             })
           }
@@ -143,7 +155,7 @@ onMounted(async () => {
         Lưu
       </div>
       <div
-        v-if="updateResult && updateResult.status && !isDisabled"
+        v-if="updateResult && updateResult.status && !isDisabled && workerStateIndex == 3"
         style="color: green; font-weight: bold; margin-right: 20px"
       >
         {{ updateResult.status == 200 ? 'Lưu thành công' : 'Lưu không thành công' }}!!!
@@ -157,7 +169,7 @@ onMounted(async () => {
             <Steps
               :model="workerStates"
               class="custom-steps"
-              :readonly="isDisabled"
+              :readonly="isDisabled || workerStateIndex == 3"
               v-model:activeStep="workerStateIndex"
               :pt="{
                 menu: ({ state }) => {
@@ -209,13 +221,13 @@ onMounted(async () => {
             </Steps>
           </div>
         </div>
-        <div class="col-5 p-0" v-if="workerStateIndex == 2 || workerStateIndex == 3">
+        <div class="col-5 p-0" v-if="workerStateIndex >= 2">
           <div class="d-flex flex-column gap-1 mb-3">
             <label>Ngày xuất cảnh</label>
             <div class="flex-auto">
               <Calendar
                 v-model="calendarGoAbroadDate"
-                :disabled="isDisabled"
+                :disabled="isDisabled || workerStateIndex == 3"
                 showIcon
                 :showOnFocus="false"
                 dateFormat="dd/mm/yy"
@@ -230,13 +242,13 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <div class="col-5 p-0" v-if="workerStateIndex == 3">
+        <div class="col-5 p-0" v-if="workerStateIndex >= 2">
           <div class="d-flex flex-column gap-1 mb-3">
             <label>Ngày về nước</label>
             <div class="flex-auto">
               <Calendar
                 v-model="calendarGoBackDate"
-                :disabled="isDisabled"
+                :disabled="isDisabled || workerStateIndex == 3"
                 showIcon
                 :showOnFocus="false"
                 dateFormat="dd/mm/yy"
@@ -264,7 +276,7 @@ onMounted(async () => {
               optionLabel="orderCode"
               placeholder="Chọn mã đơn hàng"
               class="w-full"
-              :disabled="isDisabled"
+              :disabled="isDisabled || workerStateIndex >= 1"
               @change="setOrderInfo(worker.order)"
             >
               <template #value="slotProps">

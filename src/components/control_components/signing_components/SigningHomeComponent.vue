@@ -6,6 +6,7 @@ import { get, post } from '@/utils/httpRequest'
 import { FilterMatchMode } from 'primevue/api'
 
 import ListComponent from '../content_components/ListComponent.vue'
+import * as pdfjsLib from 'pdfjs-dist/webpack'
 
 const signingList = ref(null)
 const signingHctList = ref(null)
@@ -24,7 +25,6 @@ const signingStateDropdown = ref([])
 
 const isPortfolioShow = ref(null)
 const portfolio = ref({})
-const portfolioIframe = ref(null)
 const inputFilePortfolio = ref(null)
 const inputFilePortfolioFileChose = ref(null)
 const uploadPortfolioResult = ref(null)
@@ -77,22 +77,112 @@ initFilters()
 
 const handleSeePortfolio = async (data) => {
   isPortfolioShow.value = true
+
   if (!data.portfolio) {
+    portfolio.value = data
     portfolio.value.exist = null
     portfolio.value.id = data._id
   } else {
+    portfolio.value = data
+
     portfolio.value.id = data._id
-    portfolio.value.exist = await get(
-      '/file',
-      {
-        dirName: 'portfolios',
-        fileName: data.portfolio
-      },
-      { responseType: 'blob' }
-    )
-    const url = window.URL.createObjectURL(portfolio.value.exist)
-    portfolioIframe.value.src = url
+    portfolio.value.exist = await get('/file', {
+      dirName: 'portfolios',
+      fileName: data.portfolio
+    })
   }
+
+  var pdfDoc = null,
+    pageNum = 1,
+    pageRendering = false,
+    pageNumPending = null,
+    scale = 0.8,
+    canvas = document.getElementById('pdfCanvas'),
+    ctx = canvas.getContext('2d')
+  // If absolute URL from the remote server is provided, configure the CORS
+  // header on that server.
+  var url = portfolio.value.exist.url
+
+  /**
+   * Get page info from document, resize canvas accordingly, and render page.
+   * @param num Page number.
+   */
+  function renderPage(num) {
+    pageRendering = true
+    // Using promise to fetch the page
+    pdfDoc.getPage(num).then(function (page) {
+      var viewport = page.getViewport({ scale: scale })
+      canvas.height = viewport.height
+      canvas.width = viewport.width
+
+      // Render PDF page into canvas context
+      var renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      }
+      var renderTask = page.render(renderContext)
+
+      // Wait for rendering to finish
+      renderTask.promise.then(function () {
+        pageRendering = false
+        if (pageNumPending !== null) {
+          // New page rendering is pending
+          renderPage(pageNumPending)
+          pageNumPending = null
+        }
+      })
+    })
+
+    // Update page counters
+    document.getElementById('page_num').textContent = num
+  }
+
+  /**
+   * If another page rendering in progress, waits until the rendering is
+   * finised. Otherwise, executes rendering immediately.
+   */
+  function queueRenderPage(num) {
+    if (pageRendering) {
+      pageNumPending = num
+    } else {
+      renderPage(num)
+    }
+  }
+
+  /**
+   * Displays previous page.
+   */
+  function onPrevPage() {
+    if (pageNum <= 1) {
+      return
+    }
+    pageNum--
+    queueRenderPage(pageNum)
+  }
+  document.getElementById('prev').addEventListener('click', onPrevPage)
+
+  /**
+   * Displays next page.
+   */
+  function onNextPage() {
+    if (pageNum >= pdfDoc.numPages) {
+      return
+    }
+    pageNum++
+    queueRenderPage(pageNum)
+  }
+  document.getElementById('next').addEventListener('click', onNextPage)
+
+  /**
+   * Asynchronously downloads PDF.
+   */
+  pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
+    pdfDoc = pdfDoc_
+    document.getElementById('page_count').textContent = pdfDoc.numPages
+
+    // Initial/first page rendering
+    renderPage(pageNum)
+  })
 }
 
 const handleUploadPortfolio = async () => {
@@ -111,14 +201,16 @@ const handleUploadPortfolio = async () => {
     )
       .then((response) => response.json())
       .then(async (result) => {
+        isPortfolioShow.value = false
+
         const status = result.status
         if (status == 200) {
-          console.log(inputFilePortfolio.value)
           uploadPortfolioResult.value = await post(`/signing/apply/${portfolio.value.id}/update`, {
             portfolio: portfolio.value.id + '.' + inputFilePortfolio.value.name.split('.')[1]
           })
-          console.log(uploadPortfolioResult.value)
+          await handleSeePortfolio(portfolio.value)
         }
+
         resolve()
       })
       .catch((error) => {
@@ -475,16 +567,28 @@ Promise.all([getSignings()])
     <div v-if="!portfolio.exist" class="my-3">
       <div class="mb-3 fw-bolder fs-3">Đơn này chưa có thông tin hồ sơ</div>
     </div>
-    <iframe v-show="portfolio.exist" ref="portfolioIframe"></iframe>
+
+    <Button label="Trang trước" severity="danger" id="prev" class="me-2 rounded"></Button>
+    <Button label="Trang sau" severity="danger" id="next" class="rounded"></Button>
+    <div class="my-2">
+      Số trang hiện tại: <span id="page_num"></span> / <span id="page_count"></span>
+    </div>
+    <canvas
+      v-show="portfolio.exist"
+      style="display: block; width: 700px; margin: auto; box-shadow: 0 0 5px #ccc; padding: 10px"
+      id="pdfCanvas"
+    ></canvas>
     <label
       for="inputFilePortfolio"
       style="
+        display: block;
         background-color: #ccc;
         padding: 8px 20px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         display: inline-block;
+        margin-top: 10px;
       "
       >Chọn hồ sơ</label
     >

@@ -325,7 +325,6 @@ onMounted(() => {
               <InputText
                 v-model="worker.accountTraining.person.associateContact.name"
                 id="floatingAssociationContactName"
-                :disabled="isDisabled"
                 :pt="{ root: { class: 'flex-grow-1' } }"
               />
             </div>
@@ -336,7 +335,6 @@ onMounted(() => {
               <InputText
                 v-model="worker.accountTraining.person.associateContact.relation"
                 id="floatingAssociationContactRelation"
-                :disabled="isDisabled"
                 :pt="{ root: { class: 'flex-grow-1' } }"
               />
             </div>
@@ -347,7 +345,6 @@ onMounted(() => {
               <InputText
                 v-model="worker.accountTraining.person.associateContact.phoneNumber"
                 id="floatingAssociationContactPhoneNumber"
-                :disabled="isDisabled"
                 :pt="{ root: { class: 'flex-grow-1' } }"
               />
             </div>

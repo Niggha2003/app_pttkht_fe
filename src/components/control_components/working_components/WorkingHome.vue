@@ -32,6 +32,8 @@ onMounted(() => {
 
 const getWorkers = async () => {
   try {
+    workerList.value = null
+
     let workers = await get('/working/worker', {})
     if (workers) {
       workers = workers.map((w) => {

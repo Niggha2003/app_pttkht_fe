@@ -22,6 +22,7 @@ const news = ref(attrs.news)
 
 <template>
   <div
+    v-if="news"
     :class="`news p-0 ${attrs.type == 'row' ? 'row' : 'col'}`"
     style="text-transform: capitalize"
   >
@@ -49,7 +50,7 @@ const news = ref(attrs.news)
         :class="`title my-1 ${display == 1 ? 'fs-5 fw-bolder' : display == 2 ? 'fs-6 fw-bolder' : 'fs-6'}`"
       >
         <RouterLink
-          class="d-inline-block"
+          :class="display == 0 ? 'line_display_2' : ''"
           :to="{
             name: 'hp_news_view',
             params: {
@@ -90,6 +91,14 @@ const news = ref(attrs.news)
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Số dòng hiển thị */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.line_display_2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* Số dòng hiển thị */
   overflow: hidden;
   text-overflow: ellipsis;
 }

@@ -65,7 +65,7 @@ const save_function = props.saveFunction
               detail:
                 result.status && result.status == 200
                   ? 'Bạn đã sửa thông tin thành công'
-                  : 'Bạn đã sửa thông tin thất bại',
+                  : result.errorMessage,
               life: 3000
             })
           }

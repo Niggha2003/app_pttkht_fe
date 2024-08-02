@@ -63,6 +63,7 @@ updateFunction.value = async () => {
   for (const news of foreign_news.value) {
     result = await post(`/news/${news._id}/update`, { showOnHome: 0 })
   }
+
   return result
 }
 
@@ -217,7 +218,7 @@ onUpdated(() => {
           style="margin-right: -15px; background-color: #aed9ff; border-radius: 10px"
         >
           <HP_NewsComponent
-            v-if="foreign_news"
+            v-if="foreign_news && foreign_news[0]"
             :props="{
               type: 'col',
               hasImg: true,

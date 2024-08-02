@@ -40,7 +40,7 @@ const roleCheckAccess = {
   working: 'working',
   ordering: 'ordering.flight.news',
   signing: 'signing',
-  admin: 'employee'
+  admin: 'employee.working.signing.ordering.flight.news'
 }
 
 // kiểm tra người dùng đăng nhập chưa, nếu rồi thì cho truy cập còn không thì cho chuyển hướng đến trang đăng nhập
@@ -85,7 +85,7 @@ router.beforeEach(async (to, from, next) => {
 
     const menu = menuList
     // phân quyền lựa chọn các chức năng mà người dùng có thể thực hiện dựa trên role của họ
-    const newMenu = MenuShowItem(menu, [store.state.user.role])
+    const newMenu = MenuShowItem(menu, store.state.user.role)
     store.commit('changeMenu', newMenu)
 
     // thay đổi giao diện sidebar cho phù hợp mỗi view
@@ -103,7 +103,11 @@ router.beforeEach(async (to, from, next) => {
       store.commit('changeMenu', newMenu)
     }
   } else {
-    if (store.state.user.role == 'ordering') {
+    // Có hiện nút sửa ở trang chủ hay không
+    if (
+      store.state.user &&
+      (store.state.user.role == 'ordering' || store.state.user.role == 'admin')
+    ) {
       store.commit('setHomePageModifyShow', true)
     }
     next()

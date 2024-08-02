@@ -21,7 +21,7 @@ const menu = [
     type: 'working',
     icon: faPeopleGroup,
     show: false,
-    role: 'working',
+    role: 'working.admin',
     listChild: [
       {
         name: 'Danh sách lao động',
@@ -65,7 +65,7 @@ const menu = [
     opened: false,
     type: 'ordering',
     icon: faFolder,
-    role: 'ordering',
+    role: 'ordering.admin',
     listChild: [
       {
         name: 'Danh sách đơn hàng',
@@ -108,7 +108,7 @@ const menu = [
     show: false,
     opened: false,
     type: 'news',
-    role: 'ordering',
+    role: 'ordering.admin',
     icon: faNewspaper,
     listChild: [
       {
@@ -153,7 +153,7 @@ const menu = [
     opened: false,
     type: 'flight',
     icon: faPlane,
-    role: 'ordering',
+    role: 'ordering.admin',
     listChild: [
       {
         name: 'Danh sách vé máy bay',
@@ -196,7 +196,7 @@ const menu = [
     show: false,
     opened: false,
     type: 'signing',
-    role: 'signing',
+    role: 'signing.admin',
     icon: faFileContract,
     listChild: [
       {
@@ -284,7 +284,7 @@ const menu = [
     show: false,
     opened: false,
     type: 'web',
-    role: 'ordering',
+    role: 'ordering.admin',
     icon: faPager,
     to: { name: 'home_page' },
     listChild: []
@@ -335,16 +335,14 @@ export const MenuItemReset = (menu) => {
   return menu
 }
 
-export const MenuShowItem = (menu, items = []) => {
+export const MenuShowItem = (menu, item) => {
   menu.forEach((menuItem) => {
     menuItem.show = false
   })
-  items.forEach((item) => {
-    menu.forEach((menuItem, index) => {
-      if (menuItem.role == item) {
-        menu[index].show = true
-      }
-    })
+  menu.forEach((menuItem, index) => {
+    if (menuItem.role.split('.').includes(item)) {
+      menu[index].show = true
+    }
   })
   return menu
 }

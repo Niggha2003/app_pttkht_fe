@@ -25,10 +25,19 @@ const updateFunction = async () => {
     updateSlideFunction.value(),
     updateOrderFunction.value()
   ])
-  let result
+  let result,
+    i = 0
   for (let res of results) {
     result = res
-    if (!res.status) {
+    if (!res || !res.status) {
+      result = { status: 500 }
+      if (i == 0) {
+        result.errorMessage = 'Lỗi tại phần tin tức nổi bật'
+      } else if (i == 1) {
+        result.errorMessage = 'Lỗi tại phần tiêu điểm'
+      } else if (i == 2) {
+        result.errorMessage = 'Lỗi tại phần danh sách đơn hàng hot'
+      }
       break
     }
   }
