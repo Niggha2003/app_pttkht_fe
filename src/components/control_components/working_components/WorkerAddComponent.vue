@@ -29,6 +29,7 @@ const worker = ref({
       academicLevel: { text: 'Đại học', code: 'dh' },
       anotherCertificates: [],
       address: null,
+      email: null,
       associateContact: {
         name: null,
         relation: null,
@@ -95,6 +96,18 @@ const handleAddWorker = async () => {
         }
       }
     })
+    if (addResult.value && addResult.value.status && addResult.value.status == 200) {
+      await post('/send_email', {
+        email: worker.value.accountTraining.person.email,
+        title: 'Tài khoản cho đơn xuất khẩu lao động của bạn đã được đăng kí thành công',
+        text: `
+        <p>Chúc mừng ${worker.value.accountTraining.person.name} đã có tài khoản để đăng nhập vào web chúng tôi!!! </p>
+        <p>Vui lòng không chia sẻ cho người khác!!!</p>
+        <p>Tên đăng nhập: ${worker.value.accountTraining.accountCode}</p>
+        <p>Mật khẩu: ${worker.value.accountTraining.password}</p>
+        `
+      })
+    }
     addResultVisible.value = true
   } catch (e) {
     addResult.value = e
@@ -120,6 +133,7 @@ const resetAddWorker = async () => {
         academicLevel: { text: 'Đại học', code: 'dh' },
         anotherCertificates: [],
         address: null,
+        email: null,
         associateContact: {
           name: null,
           relation: null,
@@ -285,6 +299,12 @@ onMounted(() => {
               v-model="worker.accountTraining.person.phoneNumber"
               id="floatingAccountPhoneNumber"
             />
+          </div>
+        </div>
+        <div class="col-5 p-0">
+          <div class="d-flex flex-column gap-1 mb-3">
+            <label for="floatingAccountEmail">Email</label>
+            <InputText v-model="worker.accountTraining.person.email" id="floatingAccountEmail" />
           </div>
         </div>
         <div class="col-5 p-0">

@@ -69,6 +69,13 @@ const handleSendInfo = async () => {
       } else {
         information.value.order = order[0]._id
         result.value = await post('/signing/apply/create', { apply: information.value })
+        if (result.value && result.value.status && result.value.status == 200) {
+          await post('/send_email', {
+            email: information.value.email,
+            title: 'Chúc mừng bạn đã đăng kí thành công',
+            text: `<p>Chúc mừng ${information.value.name} đã gửi thông tin thành công, bạn có thể đợi chúng tôi gửi thông tin đăng nhập trong vài ngày tới!!!</p>`
+          })
+        }
       }
     }
   }
@@ -201,7 +208,7 @@ Promise.all([getInfoCompany()])
         <div>
           {{
             result && result.status && result.status == 200
-              ? ' Ứng tuyển thành công vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!!'
+              ? ' Ứng tuyển thành công, đơn xác nhận đã được gửi đến email của bạn, vui lòng quý khách đợi liên lạc từ chúng tôi trong thời gian tới!!'
               : result && result.status && result.status == 400
                 ? 'Mời nhập đầy đủ trường thông tin!!!'
                 : result && result.status && result.status == 404
@@ -209,7 +216,7 @@ Promise.all([getInfoCompany()])
                   : `Email không hợp lệ hoặc số điện thoại không hợp lệ`
           }}
         </div>
-        <div>Trân trọng!!</div>
+        <div class="my-2">Trân trọng!!</div>
       </div>
     </div>
   </Dialog>

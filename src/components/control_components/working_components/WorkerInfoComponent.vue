@@ -296,6 +296,16 @@ onMounted(() => {
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
+            <label for="floatingAccountEmail">Email</label>
+            <InputText
+              v-model="worker.accountTraining.person.email"
+              id="floatingAccountEmail"
+              :disabled="isDisabled"
+            />
+          </div>
+        </div>
+        <div class="col-5 p-0">
+          <div class="d-flex flex-column gap-1 mb-3">
             <label for="floatingAccountAddress">Địa chỉ</label>
             <InputText
               v-model="worker.accountTraining.person.address"

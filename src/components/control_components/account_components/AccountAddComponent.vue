@@ -33,6 +33,7 @@ const account = ref({
       relation: null,
       phoneNumber: null
     },
+    email: null,
     identifyCard: null
   }
 })
@@ -90,6 +91,18 @@ const handleAddAccount = async () => {
         }
       }
     })
+    if (addResult.value && addResult.value.status && addResult.value.status == 200) {
+      await post('/send_email', {
+        email: account.value.person.email,
+        title: 'Tài khoản cho đơn xuất khẩu lao động của bạn đã được đăng kí thành công',
+        text: `
+        <p>Chúc mừng ${account.value.person.name} đã có tài khoản để đăng nhập vào web chúng tôi!!! </p>
+        <p>Vui lòng không chia sẻ cho người khác!!!</p>
+        <p>Tên đăng nhập: ${account.value.accountCode}</p>
+        <p>Mật khẩu: ${account.value.password}</p>
+        `
+      })
+    }
     addResultVisible.value = true
   } catch (e) {
     addResult.value = e
@@ -118,6 +131,7 @@ const resetAddAccount = async () => {
         relation: null,
         phoneNumber: null
       },
+      email: null,
       identifyCard: null,
       photo: null,
       photoType: null
@@ -266,6 +280,12 @@ onMounted(() => {
             <div class="d-flex flex-column gap-1 mb-3">
               <label for="floatingAccountPhoneNumber">Số điện thoại</label>
               <InputText v-model="account.person.phoneNumber" id="floatingAccountPhoneNumber" />
+            </div>
+          </div>
+          <div class="col-5 p-0">
+            <div class="d-flex flex-column gap-1 mb-3">
+              <label for="floatingAccountEmail">Email</label>
+              <InputText v-model="account.person.email" id="floatingAccountEmail" />
             </div>
           </div>
           <div class="col-5 p-0">

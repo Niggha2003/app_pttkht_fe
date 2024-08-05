@@ -280,6 +280,12 @@ const handleChangeModifyMode = (state) => {
         </div>
         <div class="col-5 p-0">
           <div class="d-flex flex-column gap-1 mb-3">
+            <label for="AccountEmail">Email</label>
+            <InputText v-model="account.person.email" id="AccountEmail" :disabled="isDisabled" />
+          </div>
+        </div>
+        <div class="col-5 p-0">
+          <div class="d-flex flex-column gap-1 mb-3">
             <label for="AccountAddress">Địa chỉ</label>
             <InputText
               v-model="account.person.address"
